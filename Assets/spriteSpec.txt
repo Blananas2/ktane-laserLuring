@@ -1,0 +1,47 @@
+Cat Sprites:
+    Number is via the following formula
+    (10xB)+A
+    where B is the Breed:
+        0 = Orange
+        1 = Black (mostly undrawn)
+        2 = White (mostly undrawn)
+    where A is the Action:
+        0 = Sitting
+        1-8 = Walk Cycle [ascending frame order]
+        9 = Pouncing (undrawn)
+{May adjust formula later; will likely add more breeds}
+
+Item Sprites:
+0 = Vase
+1 = Picture Frame
+2 = Trophy
+3 = Piggy Bank
+4 = Dartboard
+{Add more later}
+
+Furnature Sprites:
+0 = Couch
+1 = Shelf
+2 = Bookcase
+3 = Piano (undrawn)
+
+Other Sprites:
+0 = Cursor
+1 = Collar Sitting
+2 = Collar Walk Cycle
+3 = Collar Pouncing (undrawn)
+
+Slots:
+0-2 = Cats
+3-5 = Collars
+6-15 = Furnature
+16-25 = Items
+26-35 = Cursors
+
+Layers:
+0 = Background
+1 = Furnature
+2 = Items
+3 = Cats
+4 = Collars
+5 = Cursors
