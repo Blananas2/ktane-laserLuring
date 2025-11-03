@@ -11,13 +11,8 @@ Cat Sprites:
         9 = Pouncing (undrawn)
 {May adjust formula later; will likely add more breeds}
 
-Item Sprites:
-0 = Vase
-1 = Picture Frame
-2 = Trophy
-3 = Piggy Bank
-4 = Dartboard
-{Add more later}
+Item Sprites are in reading order in the manual
+Note that care needs to be taken to go from original coord => item bc of the extra step
 
 Furnature Sprites:
 0 = Couch
@@ -30,6 +25,7 @@ Other Sprites:
 1 = Collar Sitting
 2 = Collar Walk Cycle
 3 = Collar Pouncing (undrawn)
+4 = Laser (undrawn)
 
 Slots:
 0-2 = Cats
