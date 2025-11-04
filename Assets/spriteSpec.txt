@@ -26,18 +26,21 @@ Other Sprites:
 2 = Collar Walk Cycle
 3 = Collar Pouncing (undrawn)
 4 = Laser (undrawn)
+5 = Cat Smile
 
 Slots:
 0-2 = Cats
 3-5 = Collars
-6-15 = Furnature
-16-25 = Items
-26-35 = Cursors
+6-8 = Smiles
+9-18 = Furnature
+19-23 = Items
+24-35 = Cursors
 
 Layers:
 0 = Background
 1 = Furnature
 2 = Items
 3 = Cats
-4 = Collars
+4 = Collars, Smiles
 5 = Cursors
+100 = Debug
