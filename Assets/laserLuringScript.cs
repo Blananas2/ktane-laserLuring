@@ -69,13 +69,15 @@ public class laserLuringScript : MonoBehaviour {
         CatPosX[2] += 2;
 
         GeneratePuzzle();
+        //calc favorites
         for (int m = 0; m < 3; m++)
         {
             bool flipEm = Rnd.Range(0, 2) == 0;
             CatFacing[m] = flipEm;
             SetSprite(CatPosX[m], 17, 3, Slots[m], CatSprites[ChosenCats[m] * 10], Color.white, flipEm);
-            SetSprite(CatPosX[m], 17, 4, Slots[m+3], OtherSprites[1], COLORS_PROPER[ChosenCollars[m]], flipEm);
+            SetSprite(CatPosX[m], 17, 4, Slots[m + 3], OtherSprites[1], COLORS_PROPER[ChosenCollars[m]], flipEm);
         }
+        //generate room
     }
 
     void ButtonPress(KMSelectable BS)
