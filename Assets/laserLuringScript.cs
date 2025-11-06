@@ -74,8 +74,8 @@ public class laserLuringScript : MonoBehaviour {
         {
             bool flipEm = Rnd.Range(0, 2) == 0;
             CatFacing[m] = flipEm;
-            SetSprite(CatPosX[m], 17, 3, Slots[m], CatSprites[ChosenCats[m] * 10], Color.white, flipEm);
-            SetSprite(CatPosX[m], 17, 4, Slots[m + 3], OtherSprites[1], COLORS_PROPER[ChosenCollars[m]], flipEm);
+            SetSprite(CatPosX[m], 17, 3+m, Slots[m], CatSprites[ChosenCats[m] * 10], Color.white, flipEm);
+            SetSprite(CatPosX[m], 17, 6, Slots[m + 3], OtherSprites[1], COLORS_PROPER[ChosenCollars[m]], flipEm);
         }
         //generate room
     }
@@ -102,11 +102,13 @@ public class laserLuringScript : MonoBehaviour {
     void GeneratePuzzle()
     {
         int attps = 1;
+        int attpsButLess = 0;
     retry:
         ChosenCats = Enumerable.Range(0, 10).ToArray().Shuffle().Take(3).ToArray();
         int[] powersOfTwo = { 4, 2, 1 }; //lazy but idgaf
         powersOfTwo = powersOfTwo.Shuffle();
         for (int q = 0; q < 3; q++) { ChosenCollars[q] = Rnd.Range(0, 8) | powersOfTwo[q]; } //the bitwise or ensures that each of the lasers can be used for different cats
+        if (ChosenCollars[0] == ChosenCollars[1] || ChosenCollars[0] == ChosenCollars[2] || ChosenCollars[1] == ChosenCollars[2]) { attpsButLess++; goto retry; }
         int[] catInitSplit = CalcInits(ChosenCats, ChosenCollars);
         int[] catInits = { catInitSplit[0] * 8 + catInitSplit[3], catInitSplit[1] * 8 + catInitSplit[4], catInitSplit[2] * 8 + catInitSplit[5] };
         if (catInits[0] == catInits[1] || catInits[0] == catInits[2] || catInits[1] == catInits[2] ||
@@ -118,7 +120,7 @@ public class laserLuringScript : MonoBehaviour {
             goto retry;
         }
         
-        Debug.LogFormat("<Laser Luring #{0}> Attempts: {1}", moduleId, attps);
+        Debug.LogFormat("<Laser Luring #{0}> Attempts: {1}{2}", moduleId, attps, attpsButLess == 0 ? "" : "." + attps);
         Debug.LogFormat("[Laser Luring #{0}] Cats: {1} {2}, {3} {4}, {5} {6}", moduleId, CAT_NAMES[ChosenCats[0]], COLOR_NAMES[ChosenCollars[0]], CAT_NAMES[ChosenCats[1]], COLOR_NAMES[ChosenCollars[1]], CAT_NAMES[ChosenCats[2]], COLOR_NAMES[ChosenCollars[2]]);
         Debug.LogFormat("[Laser Luring #{0}] {1}'s initial position: Row {2}, Column {3}", moduleId, CAT_NAMES[ChosenCats[0]], catInitSplit[0], catInitSplit[3]);
         Debug.LogFormat("[Laser Luring #{0}] {1}'s initial position: Row {2}, Column {3}", moduleId, CAT_NAMES[ChosenCats[1]], catInitSplit[1], catInitSplit[4]);

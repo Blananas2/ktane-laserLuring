@@ -40,7 +40,7 @@ Layers:
 0 = Background
 1 = Furnature
 2 = Items
-3 = Cats
-4 = Collars, Smiles
-5 = Cursors
+3,4,5 = Cats
+6 = Collars, Smiles
+7 = Cursors
 100 = Debug
