@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,8 @@ using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
 
-public class laserLuringScript : MonoBehaviour {
+public class laserLuringScript : MonoBehaviour
+{
 
     public KMBombInfo Bomb;
     public KMAudio Audio;
@@ -20,33 +21,36 @@ public class laserLuringScript : MonoBehaviour {
     public Sprite[] OtherSprites;
     public SpriteRenderer[] Slots;
 
-    string[] CAT_NAMES = { "Cleo", "Dart", "Finn", "Lena", "Nuki", "Remi", "Scar", "Tiki", "Vivi", "Wind" };
-    string[] COLOR_NAMES = { "black", "blue", "green", "cyan", "red", "magenta", "yellow", "white" };
-    Color[] COLORS_PROPER = { Color.black, Color.blue, Color.green, Color.cyan, Color.red, Color.magenta, Color.yellow, Color.white };
+    private static readonly string[] CAT_NAMES = { "Cleo", "Dart", "Finn", "Lena", "Nuki", "Remi", "Scar", "Tiki", "Vivi", "Wind" };
+    private static readonly string[] COLOR_NAMES = { "black", "blue", "green", "cyan", "red", "magenta", "yellow", "white" };
+    private static readonly Color[] COLORS_PROPER = { Color.black, Color.blue, Color.green, Color.cyan, Color.red, Color.magenta, Color.yellow, Color.white };
     int[] ChosenCats;
     int[] ChosenCollars = { -1, -1, -1 };
     int[] CatPosX = { -1, -1, -1 };
     int[] CatPosY = { 17, 17, 17 };
     bool[] CatFacing = { false, false, false };
 
-    float LEFT_EDGE = -0.0806f;
-    float TOP_EDGE = 0.0431f;
-    float GRID_SQ = 0.00575888f;
-    int SQ_ACROSS = 29;
-    int SQ_TALL = 23;
-    int FLOOR = 18;
-    int ITEM_LOWEST = 15;
-    int CAT_RANGE = 4;
+    private const float LEFT_EDGE = -0.0806f;
+    private const float TOP_EDGE = 0.0431f;
+    private const float GRID_SQ = 0.00575888f;
+    private const int SQ_ACROSS = 29;
+    private const int SQ_TALL = 19;
+    private const int MAX_IN_AIR_DURATION = 10;
+    private const int SHELF_COUNT = 9;
+
+    private int[] _shelfPositions = new int[SQ_ACROSS * SQ_TALL];
 
     //Logging
     static int moduleIdCounter = 1;
     int moduleId;
     private bool moduleSolved;
 
-    void Awake () {
+    void Awake()
+    {
         moduleId = moduleIdCounter++;
 
-        foreach (KMSelectable Button in Buttons) {
+        foreach (KMSelectable Button in Buttons)
+        {
             Button.OnHighlight += delegate () { /*ButtonHover(Button);*/ };
             Button.OnInteract += delegate () { ButtonPress(Button); return false; };
         }
@@ -56,17 +60,19 @@ public class laserLuringScript : MonoBehaviour {
     }
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         float scalar = transform.lossyScale.x; //standard light procedure: all lights must be scaled based on the scale of the bomb
-        for (int l = 0; l < 3; l++) {
+        for (int l = 0; l < 3; l++)
+        {
             Lights[l].range *= scalar;
             Lights[l].gameObject.SetActive(false);
         }
 
-        for (int p = 0; p < 3; p++) { CatPosX[p] = Rnd.Range(3, 26); } //gen three initial positions, these are delicately chosen so they can be manipulated while of course staying in view
+        for (int p = 0; p < 3; p++) { CatPosX[p] = Rnd.Range(4, 25); } //gen three initial positions, these are delicately chosen so they can be manipulated while of course staying in view
         Array.Sort(CatPosX); //put them in ascending order
-        CatPosX[0] -= 2; //bump the end cats so the cats can't overlap
-        CatPosX[2] += 2;
+        CatPosX[0] -= 3; //bump the end cats so the cats can't overlap
+        CatPosX[2] += 3;
 
         GeneratePuzzle();
         //calc favorites
@@ -74,10 +80,19 @@ public class laserLuringScript : MonoBehaviour {
         {
             bool flipEm = Rnd.Range(0, 2) == 0;
             CatFacing[m] = flipEm;
-            SetSprite(CatPosX[m], 17, 3+m, Slots[m], CatSprites[ChosenCats[m] * 10], Color.white, flipEm);
+            SetSprite(CatPosX[m], 17, 3 + m, Slots[m], CatSprites[ChosenCats[m] * 10], Color.white, flipEm);
             SetSprite(CatPosX[m], 17, 6, Slots[m + 3], OtherSprites[1], COLORS_PROPER[ChosenCollars[m]], flipEm);
         }
         //generate room
+
+        _shelfPositions = GenerateShelves();
+        // centers of the shelves
+        Debug.Log(_shelfPositions.Select(i => GetCoord(i)).Join(" "));
+    }
+
+    private string GetCoord(int num)
+    {
+        return "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#"[num % SQ_ACROSS].ToString() + (num / SQ_ACROSS + 1).ToString();
     }
 
     void ButtonPress(KMSelectable BS)
@@ -87,8 +102,8 @@ public class laserLuringScript : MonoBehaviour {
             if (Buttons[btn] == BS)
             {
                 Lights[btn].gameObject.SetActive(true);
-                Lights[(btn+1)%3].gameObject.SetActive(false);
-                Lights[(btn+2)%3].gameObject.SetActive(false);
+                Lights[(btn + 1) % 3].gameObject.SetActive(false);
+                Lights[(btn + 2) % 3].gameObject.SetActive(false);
                 /*
                 int xx = Rnd.Range(0, SQ_ACROSS);
                 int yy = Rnd.Range(0, SQ_TALL);
@@ -103,7 +118,7 @@ public class laserLuringScript : MonoBehaviour {
     {
         int attps = 1;
         int attpsButLess = 0;
-    retry:
+        retry:
         ChosenCats = Enumerable.Range(0, 10).ToArray().Shuffle().Take(3).ToArray();
         int[] powersOfTwo = { 4, 2, 1 }; //lazy but idgaf
         powersOfTwo = powersOfTwo.Shuffle();
@@ -119,14 +134,14 @@ public class laserLuringScript : MonoBehaviour {
             Debug.Log("no: " + ChosenCats.Join(",") + " " + ChosenCollars.Join(",") + " " + catInitSplit.Join(","));
             goto retry;
         }
-        
+
         Debug.LogFormat("<Laser Luring #{0}> Attempts: {1}{2}", moduleId, attps, attpsButLess == 0 ? "" : "." + attps);
         Debug.LogFormat("[Laser Luring #{0}] Cats: {1} {2}, {3} {4}, {5} {6}", moduleId, CAT_NAMES[ChosenCats[0]], COLOR_NAMES[ChosenCollars[0]], CAT_NAMES[ChosenCats[1]], COLOR_NAMES[ChosenCollars[1]], CAT_NAMES[ChosenCats[2]], COLOR_NAMES[ChosenCollars[2]]);
         Debug.LogFormat("[Laser Luring #{0}] {1}'s initial position: Row {2}, Column {3}", moduleId, CAT_NAMES[ChosenCats[0]], catInitSplit[0], catInitSplit[3]);
         Debug.LogFormat("[Laser Luring #{0}] {1}'s initial position: Row {2}, Column {3}", moduleId, CAT_NAMES[ChosenCats[1]], catInitSplit[1], catInitSplit[4]);
         Debug.LogFormat("[Laser Luring #{0}] {1}'s initial position: Row {2}, Column {3}", moduleId, CAT_NAMES[ChosenCats[2]], catInitSplit[2], catInitSplit[5]);
     }
-    
+
     int[] CalcInits(int[] catV, int[] colV)
     {
         bool[] CAT_GEN = { true, false, false, true, true, false, false, false, true, true };
@@ -271,12 +286,182 @@ public class laserLuringScript : MonoBehaviour {
         return new int[] { initRows[0], initRows[1], initRows[2], initCols[0], initCols[1], initCols[2] };
     }
 
+    private int[] GenerateShelves()
+    {
+        TryAgain:
+        var shelfList = new List<int>();
+        int shelfWidth = 5;
+        var randomPositions = Enumerable.Range(0, SHELF_COUNT).Select(i => Rnd.Range(0, SQ_ACROSS * SQ_TALL)).ToArray();
+
+        // If the X position is too far right
+        if (randomPositions.Any(num => num % SQ_ACROSS > SQ_ACROSS - (shelfWidth + 1)))
+            goto TryAgain;
+
+        // If the Y position is too high or too low
+        if (randomPositions.Any(num => num / SQ_ACROSS < 3 || num / SQ_ACROSS > SQ_TALL - 3))
+            goto TryAgain;
+
+        for (int i = 0; i < randomPositions.Length; i++)
+        {
+            var ps = Enumerable.Range(0, 5).Select(x => randomPositions[i] + x).ToArray();
+            shelfList.AddRange(ps);
+        }
+
+        var requiredClearAreas = new List<int>();
+        for (int i = 0; i < shelfList.Count; i++)
+        {
+            var A = shelfList.Select(x => x - (SQ_ACROSS * 1)).ToList();
+            var B = shelfList.Select(x => x - (SQ_ACROSS * 2)).ToList();
+            var C = shelfList.Select(x => x - (SQ_ACROSS * 3)).ToList();
+            requiredClearAreas.AddRange(A);
+            requiredClearAreas.AddRange(B);
+            requiredClearAreas.AddRange(C);
+        }
+        if (shelfList.Any(i => requiredClearAreas.Contains(i)))
+            goto TryAgain;
+
+        // If there is a position that more than one shelf occupies
+        if (shelfList.Distinct().Count() != shelfList.Count())
+            goto TryAgain;
+
+        var arr = new int[SHELF_COUNT];
+        for (int i = 0; i < SHELF_COUNT; i++)
+            arr[i] = shelfList[i * 5 + 2];
+
+        // If any of the shelves are aligned vertically
+        if (arr.Select(i => i % SQ_ACROSS).Distinct().Count() != arr.Select(i => i % SQ_ACROSS).Count())
+            goto TryAgain;
+
+        // If none of the shelves are reachable (the cat can be in the air for at most 10 units)
+        bool valid = AreShelvesReachable(shelfList);
+        if (!valid)
+            goto TryAgain;
+
+        string str = "";
+        for (int p = 0; p < SQ_ACROSS * SQ_TALL; p++)
+        {
+            if (p % SQ_ACROSS == 0)
+                str += "\n";
+            if (shelfList.Contains(p))
+                str += "▓";
+            else
+                str += "░";
+        }
+        Debug.Log(str);
+
+        return arr;
+    }
+
+    class Fuckage
+    {
+        public int Position;
+        public int InAirDuration;
+
+        public Fuckage(int position, int inAirDuration)
+        {
+            Position = position;
+            InAirDuration = inAirDuration;
+        }
+
+        public bool Equals(Fuckage other)
+        {
+            return other != null && Position == other.Position;
+        }
+    }
+
+    struct QueueItem
+    {
+        public Fuckage Index;
+        public Fuckage Parent;
+
+        public QueueItem(Fuckage index, Fuckage parent)
+        {
+            Index = index;
+            Parent = parent;
+        }
+    }
+
+    private bool AreShelvesReachable(List<int> shelfPositions)
+    {
+        var standablePositions = new List<int>();
+
+        var shelfCenters = new int[SHELF_COUNT];
+        for (int i = 0; i < SHELF_COUNT; i++)
+            shelfCenters[i] = shelfPositions[i * 5 + 2];
+
+        var s = shelfPositions.Select(i => i - SQ_ACROSS).ToList();
+
+        standablePositions.AddRange(s);
+        standablePositions.AddRange(Enumerable.Range((SQ_TALL - 1) * SQ_ACROSS, SQ_ACROSS));
+
+        for (int i = 0; i < standablePositions.Count; i++)
+        {
+            var visited = new Dictionary<int, QueueItem>();
+            var q = new Queue<QueueItem>();
+            var goal = new Fuckage(standablePositions[i], 0);
+
+            var start = new Fuckage(standablePositions.Last(), 0);
+
+            q.Enqueue(new QueueItem(start, null));
+
+            while (q.Count > 0)
+            {
+                var qi = q.Dequeue();
+                if (visited.ContainsKey(qi.Index.Position))
+                    continue;
+                visited[qi.Index.Position] = qi;
+                if (qi.Index.Equals(goal))
+                    goto Found;
+
+                if (qi.Index.Position % SQ_ACROSS > 0)
+                {
+                    var f = new Fuckage(qi.Index.Position - 1, qi.Index.InAirDuration + 1);
+                    if (!shelfPositions.Contains(f.Position))
+                    {
+                        if (standablePositions.Contains(qi.Index.Position))
+                            f.InAirDuration = 0;
+                        if (f.InAirDuration <= MAX_IN_AIR_DURATION)
+                            q.Enqueue(new QueueItem(f, qi.Index));
+                    }
+                }
+
+                if (qi.Index.Position % SQ_ACROSS < SQ_ACROSS - 1)
+                {
+                    var f = new Fuckage(qi.Index.Position + 1, qi.Index.InAirDuration + 1);
+                    if (!shelfPositions.Contains(f.Position))
+                    {
+                        if (standablePositions.Contains(qi.Index.Position))
+                            f.InAirDuration = 0;
+                        if (f.InAirDuration <= MAX_IN_AIR_DURATION)
+                            q.Enqueue(new QueueItem(f, qi.Index));
+                    }
+                }
+
+                if (qi.Index.Position / SQ_ACROSS > 0)
+                {
+                    var f = new Fuckage(qi.Index.Position - SQ_ACROSS, qi.Index.InAirDuration + 1);
+                    if (!shelfPositions.Contains(f.Position))
+                    {
+                        if (standablePositions.Contains(qi.Index.Position))
+                            f.InAirDuration = 0;
+                        if (f.InAirDuration <= MAX_IN_AIR_DURATION)
+                            q.Enqueue(new QueueItem(f, qi.Index));
+                    }
+                }
+            }
+            return false;
+            Found:;
+            continue;
+        }
+        return true;
+    }
+
     /*
     void buttonPress() {
 
     }
     */
-    
+
     void SetSprite(float xp, float yp, int zp, SpriteRenderer slot, Sprite spr, Color col, bool fx)
     {
         slot.sprite = spr;
