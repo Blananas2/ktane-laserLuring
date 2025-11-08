@@ -14,12 +14,6 @@ Cat Sprites:
 Item Sprites are in reading order in the manual
 Note that care needs to be taken to go from original coord => item bc of the extra step
 
-Furnature Sprites:
-0 = Couch
-1 = Shelf
-2 = Bookcase
-3 = Piano (undrawn)
-
 Other Sprites:
 0 = Cursor
 1 = Collar Sitting
@@ -27,18 +21,19 @@ Other Sprites:
 3 = Collar Pouncing (undrawn)
 4 = Laser (undrawn)
 5 = Cat Smile
+6 = Shelf
 
 Slots:
 0-2 = Cats
 3-5 = Collars
 6-8 = Smiles
-9-18 = Furnature
-19-23 = Items
-24-35 = Cursors
+9-17 = Shelves
+18-20 = Items
+21-31 = Cursors
 
 Layers:
 0 = Background
-1 = Furnature
+1 = Shelves
 2 = Items
 3,4,5 = Cats
 6 = Collars, Smiles

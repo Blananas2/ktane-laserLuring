@@ -29,6 +29,7 @@ public class laserLuringScript : MonoBehaviour
     int[] CatPosX = { -1, -1, -1 };
     int[] CatPosY = { 17, 17, 17 };
     bool[] CatFacing = { false, false, false };
+    int? LaserColor = null;
 
     private const float LEFT_EDGE = -0.0806f;
     private const float TOP_EDGE = 0.0431f;
@@ -38,7 +39,7 @@ public class laserLuringScript : MonoBehaviour
     private const int MAX_IN_AIR_DURATION = 10;
     private const int SHELF_COUNT = 9;
 
-    private int[] _shelfPositions = new int[SQ_ACROSS * SQ_TALL];
+    private int[] ShelfPositions = new int[SQ_ACROSS * SQ_TALL];
 
     //Logging
     static int moduleIdCounter = 1;
@@ -80,19 +81,22 @@ public class laserLuringScript : MonoBehaviour
         {
             bool flipEm = Rnd.Range(0, 2) == 0;
             CatFacing[m] = flipEm;
-            SetSprite(CatPosX[m], 17, 3 + m, Slots[m], CatSprites[ChosenCats[m] * 10], Color.white, flipEm);
-            SetSprite(CatPosX[m], 17, 6, Slots[m + 3], OtherSprites[1], COLORS_PROPER[ChosenCollars[m]], flipEm);
+            SetSprite(CatPosX[m], 17, 3 + m, Slots[m], CatSprites[ChosenCats[m] * 10], Color.white, flipEm, false);
+            SetSprite(CatPosX[m], 17, 6, Slots[m + 3], OtherSprites[1], COLORS_PROPER[ChosenCollars[m]], flipEm, false);
         }
-        //generate room
 
-        _shelfPositions = GenerateShelves();
-        // centers of the shelves
-        Debug.Log(_shelfPositions.Select(i => GetCoord(i)).Join(" "));
+        ShelfPositions = GenerateShelves();
+        Debug.LogFormat("<Laser Luring #{0}> Shelves: {1}", moduleId, ShelfPositions.Select(i => GetCoord(i)).Join(" "));
+        for (int s = 0; s < 9; s++)
+        {
+            int flipIt = Rnd.Range(0, 4);
+            SetSprite(ShelfPositions[s] % SQ_ACROSS, ShelfPositions[s] / SQ_ACROSS, 1, Slots[9 + s], OtherSprites[6], Color.white, flipIt % 2 == 0, flipIt > 1);
+        }
     }
 
     private string GetCoord(int num)
     {
-        return "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#"[num % SQ_ACROSS].ToString() + (num / SQ_ACROSS + 1).ToString();
+        return (num % SQ_ACROSS).ToString() + "," + (num / SQ_ACROSS);
     }
 
     void ButtonPress(KMSelectable BS)
@@ -102,14 +106,10 @@ public class laserLuringScript : MonoBehaviour
             if (Buttons[btn] == BS)
             {
                 Lights[btn].gameObject.SetActive(true);
-                Lights[(btn + 1) % 3].gameObject.SetActive(false);
-                Lights[(btn + 2) % 3].gameObject.SetActive(false);
-                /*
-                int xx = Rnd.Range(0, SQ_ACROSS);
-                int yy = Rnd.Range(0, SQ_TALL);
-                //SetSprite(xx, yy, 5, Slots[0], Sprites[0], Color.HSVToRGB(1f, 1f, 1f), b == 0);
-                //Debug.Log("x:" + xx + " y:" + yy);
-                */
+                LaserColor = btn;
+            } else
+            {
+                Lights[btn].gameObject.SetActive(false);
             }
         }
     }
@@ -298,7 +298,7 @@ public class laserLuringScript : MonoBehaviour
             goto TryAgain;
 
         // If the Y position is too high or too low
-        if (randomPositions.Any(num => num / SQ_ACROSS < 3 || num / SQ_ACROSS > SQ_TALL - 3))
+        if (randomPositions.Any(num => num / SQ_ACROSS < 3 || num / SQ_ACROSS > SQ_TALL - 4))
             goto TryAgain;
 
         for (int i = 0; i < randomPositions.Length; i++)
@@ -347,7 +347,7 @@ public class laserLuringScript : MonoBehaviour
             else
                 str += "░";
         }
-        Debug.Log(str);
+        Debug.LogFormat("<Laser Luring #{0}> Shelves but string:\n{1}", moduleId, str);
 
         return arr;
     }
@@ -462,12 +462,13 @@ public class laserLuringScript : MonoBehaviour
     }
     */
 
-    void SetSprite(float xp, float yp, int zp, SpriteRenderer slot, Sprite spr, Color col, bool fx)
+    void SetSprite(float xp, float yp, int zp, SpriteRenderer slot, Sprite spr, Color col, bool fx, bool fy)
     {
         slot.sprite = spr;
         slot.gameObject.transform.localPosition = new Vector3(LEFT_EDGE + xp * GRID_SQ, 0.0103f, TOP_EDGE - yp * GRID_SQ);
         slot.sortingOrder = zp;
         slot.color = col;
         slot.flipX = fx;
+        slot.flipY = fy;
     }
 }
