@@ -1,10 +1,17 @@
 Cat Sprites:
     Number is via the following formula
-    (10xB)+A
-    where B is the Breed:
-        0 = Orange
-        1 = Black (mostly undrawn)
-        2 = White (mostly undrawn)
+    (10xC)+A
+    where C is the Cat:
+        0 = Cleo | orange
+        1 = Dart | black   (mostly undrawn)
+        2 = Finn | white   〃
+		3 = Lena | persian 〃
+		4 = Nuki | calico  〃
+		5 = Remi | tabby   〃
+		6 = Scar | siamese 〃
+		7 = Tiki | tux     〃
+		8 = Vivi | jellie  〃
+		9 = Wind | gray    〃
     where A is the Action:
         0 = Sitting
         1-8 = Walk Cycle [ascending frame order]
@@ -19,7 +26,7 @@ Other Sprites:
 1 = Collar Sitting
 2 = Collar Walk Cycle
 3 = Collar Pouncing (undrawn)
-4 = Laser (undrawn)
+4 = Laser
 5 = Cat Smile
 6 = Shelf
 
@@ -39,3 +46,44 @@ Layers:
 6 = Collars, Smiles
 7 = Cursors
 100 = Debug
+
+=== Item references ===
+0,1 Minecraft - Wither Painting
+0,4 _Not X01_ - Dartboard
+1,4 VVVVVV
+1,5 Return of the Obra Dinn
+1,6 Gravity Falls - Stan's Fez
+1,7 Hitman - Bobblehead
+2,4 Celeste: Strawberry Jam
+2,5 Pokémon - Unown "F"
+2,7 Team Fortress 2 - Soft Hard Hat
+3,0 Balatro - Droll Joker
+3,1 _Setting Sail_ - Ship
+3,2 Lethal Company - Zed Dog
+3,3 Among Us - Crewmate
+3,5 Plants vs. Zombies - Peashooter
+3,7 The Office - IT IS YOUR BIRTHDAY.
+4,0 Return of the Obra Dinn - Watch
+4,4 Bejeweled - Red Gem
+4,5 Minecraft - Creeper
+4,6 Firewatch - Walkie Talkie
+4,7 Pixar - Luxo Ball
+5,0 Wii Play - Tank
+5,1 Lethal Company - Man Eater
+5,2 _Bartending_ / VA-11 Hall-A: Cyberpunk Bartender Action - Rum
+5,3 Papers, Please - DENIED Stamp
+5,4 Papers, Please - APPROVED Stamp
+5,5 PippyInATopHat - Top Hat
+5,6 _The French Republican Calendar_ - Nivôse
+5,7 Stardew Valley - Chicken
+6,0 Stardew Valley - Watering Can
+6,4 Hue - Flask
+6,6 UFO 50: Magic Garden - Oppie
+6,7 Scrabble - C (3 points)
+7,0 Celeste - Dust Bunny
+7,1 Scribblenauts - Maxwell's Notebook
+7,2 Mort the Chicken
+7,3 The Legend of Zelda - Triforce
+7,5 Slope - Ball
+7,6 Twenty
+7,7 _The Jewel Vault_ / Marvel - Infinity Gauntlet

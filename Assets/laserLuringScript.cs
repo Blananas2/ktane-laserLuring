@@ -17,7 +17,6 @@ public class laserLuringScript : MonoBehaviour
     public Light[] Lights;
     public Sprite[] CatSprites; //See spriteSpec.txt for how these are set up!
     public Sprite[] ItemSprites;
-    public Sprite[] FurnatureSprites;
     public Sprite[] OtherSprites;
     public SpriteRenderer[] Slots;
 
