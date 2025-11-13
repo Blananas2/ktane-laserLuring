@@ -1,15 +1,15 @@
 fileFormatVersion: 2
-guid: c8c90eac55e921140b1d11ea9d3d7eb5
+guid: 274ab451e8777fd479ee7241872befef
 TextureImporter:
   fileIDToRecycleName:
-    21300000: c-black-walkcycle_0
-    21300002: c-black-walkcycle_1
-    21300004: c-black-walkcycle_2
-    21300006: c-black-walkcycle_3
-    21300008: c-black-walkcycle_4
-    21300010: c-black-walkcycle_5
-    21300012: c-black-walkcycle_6
-    21300014: c-black-walkcycle_7
+    21300000: c-calico-walkcycle_0
+    21300002: c-calico-walkcycle_1
+    21300004: c-calico-walkcycle_2
+    21300006: c-calico-walkcycle_3
+    21300008: c-calico-walkcycle_4
+    21300010: c-calico-walkcycle_5
+    21300012: c-calico-walkcycle_6
+    21300014: c-calico-walkcycle_7
   externalObjects: {}
   serializedVersion: 4
   mipmaps:
@@ -87,7 +87,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: c-black-walkcycle_0
+      name: c-calico-walkcycle_0
       rect:
         serializedVersion: 2
         x: 0
@@ -101,7 +101,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: c-black-walkcycle_1
+      name: c-calico-walkcycle_1
       rect:
         serializedVersion: 2
         x: 64
@@ -115,7 +115,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: c-black-walkcycle_2
+      name: c-calico-walkcycle_2
       rect:
         serializedVersion: 2
         x: 128
@@ -129,7 +129,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: c-black-walkcycle_3
+      name: c-calico-walkcycle_3
       rect:
         serializedVersion: 2
         x: 192
@@ -143,7 +143,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: c-black-walkcycle_4
+      name: c-calico-walkcycle_4
       rect:
         serializedVersion: 2
         x: 0
@@ -157,7 +157,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: c-black-walkcycle_5
+      name: c-calico-walkcycle_5
       rect:
         serializedVersion: 2
         x: 64
@@ -171,7 +171,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: c-black-walkcycle_6
+      name: c-calico-walkcycle_6
       rect:
         serializedVersion: 2
         x: 128
@@ -185,7 +185,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: c-black-walkcycle_7
+      name: c-calico-walkcycle_7
       rect:
         serializedVersion: 2
         x: 192

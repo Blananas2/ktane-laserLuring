@@ -37,6 +37,18 @@ public class laserLuringScript : MonoBehaviour
     private const int SQ_TALL = 19;
     private const int MAX_IN_AIR_DURATION = 10;
     private const int SHELF_COUNT = 9;
+    int[][] itemWH = new int[][] {
+        new int[] {1,3}, new int[] {2,2}, new int[] {2,2}, new int[] {2,1}, new int[] {3,3}, new int[] {1,1}, new int[] {1,2}, new int[] {1,2},
+        new int[] {1,2}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,2}, new int[] {2,2}, new int[] {1,1}, new int[] {1,1},
+        new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {2,1},
+        new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {3,2}, new int[] {1,1}, new int[] {1,3}, new int[] {3,1},
+        new int[] {1,1}, new int[] {1,1}, new int[] {1,2}, new int[] {2,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,2}, new int[] {2,2},
+        new int[] {1,1}, new int[] {1,1}, new int[] {2,3}, new int[] {1,1}, new int[] {1,1}, new int[] {2,1}, new int[] {3,2}, new int[] {1,1},
+        new int[] {1,1}, new int[] {1,2}, new int[] {2,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,3}, new int[] {1,1}, new int[] {1,1},
+        new int[] {1,1}, new int[] {1,1}, new int[] {1,2}, new int[] {1,1}, new int[] {2,3}, new int[] {2,2}, new int[] {1,1}, new int[] {1,2} 
+    };
+    int[] conv = { 36, 32, 37, 33, 38, 34, 39, 35, 4, 0, 5, 1, 6, 2, 7, 3, 44, 40, 45, 41, 46, 42, 47, 43, 12, 8, 13, 9, 14, 10, 15, 11, 52, 48, 53, 49, 54, 50, 55, 51, 20, 16, 21, 17, 22, 18, 23, 19, 60, 56, 61, 57, 62, 58, 63, 59, 28, 24, 29, 25, 30, 26, 31, 27 };
+    int[] itemIxs = { -1, -1, -1 };
 
     private int[] ShelfPositions = new int[SQ_ACROSS * SQ_TALL];
 
@@ -75,7 +87,7 @@ public class laserLuringScript : MonoBehaviour
         CatPosX[2] += 3;
 
         GeneratePuzzle();
-        //calc favorites
+
         for (int m = 0; m < 3; m++)
         {
             bool flipEm = Rnd.Range(0, 2) == 0;
@@ -134,11 +146,17 @@ public class laserLuringScript : MonoBehaviour
             goto retry;
         }
 
+        for (int fx = 0; fx < 3; fx++)
+        {
+            itemIxs[fx] = conv[catInits[fx]];
+        }
+
         Debug.LogFormat("<Laser Luring #{0}> Attempts: {1}{2}", moduleId, attps, attpsButLess == 0 ? "" : "." + attps);
         Debug.LogFormat("[Laser Luring #{0}] Cats: {1} {2}, {3} {4}, {5} {6}", moduleId, CAT_NAMES[ChosenCats[0]], COLOR_NAMES[ChosenCollars[0]], CAT_NAMES[ChosenCats[1]], COLOR_NAMES[ChosenCollars[1]], CAT_NAMES[ChosenCats[2]], COLOR_NAMES[ChosenCollars[2]]);
         Debug.LogFormat("[Laser Luring #{0}] {1}'s initial position: Row {2}, Column {3}", moduleId, CAT_NAMES[ChosenCats[0]], catInitSplit[0], catInitSplit[3]);
         Debug.LogFormat("[Laser Luring #{0}] {1}'s initial position: Row {2}, Column {3}", moduleId, CAT_NAMES[ChosenCats[1]], catInitSplit[1], catInitSplit[4]);
         Debug.LogFormat("[Laser Luring #{0}] {1}'s initial position: Row {2}, Column {3}", moduleId, CAT_NAMES[ChosenCats[2]], catInitSplit[2], catInitSplit[5]);
+        Debug.LogFormat("[Laser Luring #{0}] Favorite items: i{1} for {2}, i{3} for {4}, i{5} for {6}", moduleId, itemIxs[0], CAT_NAMES[ChosenCats[0]], itemIxs[1], CAT_NAMES[ChosenCats[1]], itemIxs[2], CAT_NAMES[ChosenCats[2]]);
     }
 
     int[] CalcInits(int[] catV, int[] colV)
@@ -335,6 +353,16 @@ public class laserLuringScript : MonoBehaviour
         bool valid = AreShelvesReachable(shelfList);
         if (!valid)
             goto TryAgain;
+
+        arr = arr.OrderBy(v => v / SQ_ACROSS).ToArray();
+
+        //TODO: shuffle the items BEFORE placing them in the scene -- make sure to take into account how they were shuffled much later when it determines whether a cat's interested or not
+
+        for (int it = 0; it < 3; it++)
+        {
+            bool possibleBump = Rnd.Range(0, 2) == 0;
+            SetSprite((arr[it] % SQ_ACROSS) + (itemWH[itemIxs[it]][0] == 2 ? (possibleBump ? 0.5f : -0.5f) : 0), (arr[it] / SQ_ACROSS) - 1 - (itemWH[itemIxs[it]][1] - 1) * 0.5f, 2, Slots[18 + it], ItemSprites[itemIxs[it]], Color.white, false, false);
+        }
 
         string str = "";
         for (int p = 0; p < SQ_ACROSS * SQ_TALL; p++)

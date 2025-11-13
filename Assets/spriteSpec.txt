@@ -1,21 +1,21 @@
 Cat Sprites:
-    Number is via the following formula
-    (10xC)+A
-    where C is the Cat:
-        0 = Cleo | orange
-        1 = Dart | black   (mostly undrawn)
-        2 = Finn | white   〃
-		3 = Lena | persian 〃
-		4 = Nuki | calico  〃
-		5 = Remi | tabby   〃
-		6 = Scar | siamese 〃
-		7 = Tiki | tux     〃
-		8 = Vivi | jellie  〃
-		9 = Wind | gray    〃
-    where A is the Action:
-        0 = Sitting
-        1-8 = Walk Cycle [ascending frame order]
-        9 = Pouncing (undrawn)
+	Number is via the following formula
+	(10xC)+A
+	where C is the Cat:
+		0 = Cleo (orange)
+		1 = Dart (black)
+		2 = Finn (white)
+		3 = Lena (persian)
+		4 = Nuki (calico)
+		5 = Remi (tabby)
+		6 = Scar (siamese)
+		7 = Tiki (tux)
+		8 = Vivi (jellie)
+		9 = Wind (gray)
+	where A is the Action:
+		0 = Sitting
+		1-8 = Walk Cycle [ascending frame order]
+		9 = Pouncing (undrawn)
 {May adjust formula later; will likely add more breeds}
 
 Item Sprites are in reading order in the manual
@@ -36,7 +36,7 @@ Slots:
 6-8 = Smiles
 9-17 = Shelves
 18-20 = Items
-21-31 = Cursors
+21-29 = Cursors
 
 Layers:
 0 = Background
@@ -54,7 +54,7 @@ Layers:
 1,5 Return of the Obra Dinn
 1,6 Gravity Falls - Stan's Fez
 1,7 Hitman - Bobblehead
-2,4 Celeste: Strawberry Jam
+2,4 Celeste : Strawberry Jam
 2,5 Pokémon - Unown "F"
 2,7 Team Fortress 2 - Soft Hard Hat
 3,0 Balatro - Droll Joker
@@ -78,7 +78,7 @@ Layers:
 5,7 Stardew Valley - Chicken
 6,0 Stardew Valley - Watering Can
 6,4 Hue - Flask
-6,6 UFO 50: Magic Garden - Oppie
+6,6 UFO 50 : Magic Garden - Oppie
 6,7 Scrabble - C (3 points)
 7,0 Celeste - Dust Bunny
 7,1 Scribblenauts - Maxwell's Notebook
