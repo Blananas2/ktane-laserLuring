@@ -27,7 +27,7 @@ public class laserLuringScript : MonoBehaviour
     int[] ChosenCollars = { -1, -1, -1 };
     int[] CatPosX = { -1, -1, -1 };
     int[] CatPosY = { 17, 17, 17 };
-    bool[] CatFacing = { false, false, false };
+    bool[] CatFacing = { false, false, false }; //left = true
     int? LaserColor = null;
 
     private const float LEFT_EDGE = -0.0806f;
@@ -49,6 +49,8 @@ public class laserLuringScript : MonoBehaviour
     };
     int[] conv = { 36, 32, 37, 33, 38, 34, 39, 35, 4, 0, 5, 1, 6, 2, 7, 3, 44, 40, 45, 41, 46, 42, 47, 43, 12, 8, 13, 9, 14, 10, 15, 11, 52, 48, 53, 49, 54, 50, 55, 51, 20, 16, 21, 17, 22, 18, 23, 19, 60, 56, 61, 57, 62, 58, 63, 59, 28, 24, 29, 25, 30, 26, 31, 27 };
     int[] itemIxs = { -1, -1, -1 };
+    int[][] orders = new int[][] { new int[] { 0, 1, 2 }, new int[] { 0, 2, 1 }, new int[] { 1, 0, 2 }, new int[] { 1, 2, 0 }, new int[] { 2, 0, 1 }, new int[] { 2, 1, 0 } };
+    int orderIx = -1;
 
     private int[] ShelfPositions = new int[SQ_ACROSS * SQ_TALL];
 
@@ -80,6 +82,8 @@ public class laserLuringScript : MonoBehaviour
             Lights[l].range *= scalar;
             Lights[l].gameObject.SetActive(false);
         }
+
+        orderIx = Rnd.Range(0, 6);
 
         for (int p = 0; p < 3; p++) { CatPosX[p] = Rnd.Range(4, 25); } //gen three initial positions, these are delicately chosen so they can be manipulated while of course staying in view
         Array.Sort(CatPosX); //put them in ascending order
@@ -356,12 +360,13 @@ public class laserLuringScript : MonoBehaviour
 
         arr = arr.OrderBy(v => v / SQ_ACROSS).ToArray();
 
-        //TODO: shuffle the items BEFORE placing them in the scene -- make sure to take into account how they were shuffled much later when it determines whether a cat's interested or not
+        int[] waluigi = orders[orderIx];
 
-        for (int it = 0; it < 3; it++)
+        for (int nit = 0; nit < 3; nit++)
         {
+            int it = waluigi[nit];
             bool possibleBump = Rnd.Range(0, 2) == 0;
-            SetSprite((arr[it] % SQ_ACROSS) + (itemWH[itemIxs[it]][0] == 2 ? (possibleBump ? 0.5f : -0.5f) : 0), (arr[it] / SQ_ACROSS) - 1 - (itemWH[itemIxs[it]][1] - 1) * 0.5f, 2, Slots[18 + it], ItemSprites[itemIxs[it]], Color.white, false, false);
+            SetSprite((arr[nit] % SQ_ACROSS) + (itemWH[itemIxs[it]][0] == 2 ? (possibleBump ? 0.5f : -0.5f) : 0), (arr[nit] / SQ_ACROSS) - 1 - (itemWH[itemIxs[it]][1] - 1) * 0.5f, 2, Slots[18 + it], ItemSprites[itemIxs[it]], Color.white, false, false);
         }
 
         string str = "";
