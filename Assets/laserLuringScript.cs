@@ -14,6 +14,7 @@ public class laserLuringScript : MonoBehaviour
     public KMAudio Audio;
 
     public KMSelectable[] Buttons;
+    public KMSelectable[] TargetSels;
     public Light[] Lights;
     public Sprite[] CatSprites; //See spriteSpec.txt for how these are set up!
     public Sprite[] ItemSprites;
@@ -69,6 +70,11 @@ public class laserLuringScript : MonoBehaviour
             Button.OnInteract += delegate () { ButtonPress(Button); return false; };
         }
 
+        foreach (KMSelectable TargetSel in TargetSels)
+        {
+            TargetSel.OnInteract += delegate () { TargetPress(TargetSel); return false; };
+        }
+
         //button.OnInteract += delegate () { buttonPress(); return false; };
 
     }
@@ -120,13 +126,24 @@ public class laserLuringScript : MonoBehaviour
         {
             if (Buttons[btn] == BS)
             {
+                if (btn == LaserColor) { continue; } //prevents a cat turning around if you select the same as it was previously
                 Lights[btn].gameObject.SetActive(true);
                 LaserColor = btn;
-            } else
+
+                //TODO: pick a cat (which must have the current rgb component in their collar) to turn around
+
+                //TODO: put the target selectables in the right spots, ditto for the sprites, have coroutine handle cycling through colors every second
+            }
+            else
             {
                 Lights[btn].gameObject.SetActive(false);
             }
         }
+    }
+ 
+    void TargetPress(KMSelectable TS)
+    {
+        Debug.Log(TS);
     }
 
     void GeneratePuzzle()
