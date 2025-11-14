@@ -130,7 +130,24 @@ public class laserLuringScript : MonoBehaviour
                 Lights[btn].gameObject.SetActive(true);
                 LaserColor = btn;
 
-                //TODO: pick a cat (which must have the current rgb component in their collar) to turn around
+                int[] catOrd = orders.PickRandom();
+                for (int nk = 0; nk < 3; nk++)
+                {
+                    int catplant = catOrd[nk];
+                    
+                    int[][] whatthefuck = {
+                        new int[] { 4, 5, 7, 6 },
+                        new int[] { 2, 3, 7, 6 },
+                        new int[] { 1, 3, 5, 7 }
+                    };
+                    if (whatthefuck[btn].Contains(ChosenCollars[catplant])) //check for if cat has the right component; it may have taken one entire crashout to reach this point
+                    {
+                        CatFacing[catplant] = !CatFacing[catplant];
+                        SetSprite(CatPosX[catplant], CatPosY[catplant], 3 + catplant, Slots[catplant], CatSprites[ChosenCats[catplant] * 10], Color.white, CatFacing[catplant], false);
+                        SetSprite(CatPosX[catplant], CatPosY[catplant], 6, Slots[catplant + 3], OtherSprites[1], COLORS_PROPER[ChosenCollars[catplant]], CatFacing[catplant], false);
+                        break;
+                    }
+                }
 
                 //TODO: put the target selectables in the right spots, ditto for the sprites, have coroutine handle cycling through colors every second
             }
