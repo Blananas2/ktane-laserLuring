@@ -27,19 +27,20 @@ public class laserLuringScript : MonoBehaviour
     int[] ChosenCats;
     int[] ChosenCollars = { -1, -1, -1 };
     int[] CatPosX = { -1, -1, -1 };
-    int[] CatPosY = { 17, 17, 17 };
+    int[] CatPosY = { 18, 18, 18 };
     bool[] CatFacing = { false, false, false }; //left = true
     int? LaserColor = null;
+    int TargetCycle; //the number of cats for the current laser color that need to be cycled through
 
     private const float LEFT_EDGE = -0.0806f;
     private const float TOP_EDGE = 0.0431f;
     private const float GRID_SQ = 0.00575888f;
     private const int SQ_ACROSS = 29;
     private const int SQ_TALL = 19;
-    private const int MAX_IN_AIR_DURATION = 10;
+    private const int IN_AIR_DURATION = 10;
     private const int SHELF_COUNT = 9;
     int[][] itemWH = new int[][] {
-        new int[] {1,3}, new int[] {2,2}, new int[] {2,2}, new int[] {2,1}, new int[] {3,3}, new int[] {1,1}, new int[] {1,2}, new int[] {1,2},
+        new int[] {1,3}, new int[] {2,2}, new int[] {2,2}, new int[] {2,1}, new int[] {3,3}, new int[] {1,1}, new int[] {2,1}, new int[] {1,2},
         new int[] {1,2}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,2}, new int[] {2,2}, new int[] {1,1}, new int[] {1,1},
         new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {2,1},
         new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {3,2}, new int[] {1,1}, new int[] {1,3}, new int[] {3,1},
@@ -143,19 +144,77 @@ public class laserLuringScript : MonoBehaviour
                     if (whatthefuck[btn].Contains(ChosenCollars[catplant])) //check for if cat has the right component; it may have taken one entire crashout to reach this point
                     {
                         CatFacing[catplant] = !CatFacing[catplant];
-                        SetSprite(CatPosX[catplant], CatPosY[catplant], 3 + catplant, Slots[catplant], CatSprites[ChosenCats[catplant] * 10], Color.white, CatFacing[catplant], false);
-                        SetSprite(CatPosX[catplant], CatPosY[catplant], 6, Slots[catplant + 3], OtherSprites[1], COLORS_PROPER[ChosenCollars[catplant]], CatFacing[catplant], false);
+                        SetSprite(CatPosX[catplant], CatPosY[catplant] - 1, 3 + catplant, Slots[catplant], CatSprites[ChosenCats[catplant] * 10], Color.white, CatFacing[catplant], false);
+                        SetSprite(CatPosX[catplant], CatPosY[catplant] - 1, 6, Slots[catplant + 3], OtherSprites[1], COLORS_PROPER[ChosenCollars[catplant]], CatFacing[catplant], false);
                         break;
                     }
                 }
 
-                //TODO: put the target selectables in the right spots, ditto for the sprites, have coroutine handle cycling through colors every second
+                PlaceTargets(btn);
             }
             else
             {
                 Lights[btn].gameObject.SetActive(false);
             }
         }
+    }
+
+    void PlaceTargets(int chnl)
+    {
+        List<int> TargX = new List<int> { };
+        List<int> TargY = new List<int> { };
+        List<int> TargCol = new List<int> { };
+
+        TargetCycle = 0;
+
+        for (int kitn = 0; kitn < 3; kitn++)
+        {
+            int cc = ChosenCollars[kitn];
+            
+            if ((cc & (int)Math.Pow(2, 2-chnl)) == (int)Math.Pow(2, 2-chnl)) //collar check; all i had to do in previous crashout was this hsjkdhsadjkdhsjkal
+            {
+                TargetCycle++;
+
+                //if the cat is on the ground (posY == 18), place a target 3 spaces in front (take into account facing direction; ENSURE CAT CAN'T ESCAPE ROOM THAT WOULD BE BAD)
+                if (CatPosY[kitn] == 18)
+                {
+                    if ((CatFacing[kitn] && CatPosX[kitn] < 4) || (!CatFacing[kitn] && CatPosX[kitn] > 24)) { continue; } //oob check
+                    
+                    TargX.Add(CatPosX[kitn] + (CatFacing[kitn] ? -3 : 3));
+                    TargY.Add(18);
+                    TargCol.Add(cc);
+                }
+
+                for (int shelf = 0; shelf < SHELF_COUNT; shelf++)
+                {
+                    int shx = ShelfPositions[shelf] % SQ_ACROSS;
+                    int shy = ShelfPositions[shelf] / SQ_ACROSS;
+                    
+                    //if the cat is on a shelf with an item (shelf ix < 3), place a target on the item (1 tile above shelf)
+                    //TODO: rewrite slightly to account for facing direction
+                    if (shelf < 3 && CatPosY[kitn] == shy - 1 && Math.Abs(CatPosX[kitn] - shx) < 3)
+                    {
+                        TargX.Add(shx);
+                        TargY.Add(shy-1);
+                        TargCol.Add(cc);
+                    }
+
+                    if ((CatFacing[kitn] && (shx < CatPosX[kitn] - 3)) || (!CatFacing[kitn] && (shx > CatPosX[kitn] + 3)))
+                    {
+                        Debug.Log("<Laser Luring> Shelf " + shelf + " is in line of sight of cat " + kitn);
+                        
+                        //if manhattan distance between cat's current position and the target position is less than 10, add the target
+                        if ((Math.Abs((shx + (CatFacing[kitn] ? 2 : -2)) - CatPosX[kitn]) + Math.Abs((shy - 1) - CatPosY[kitn])) < 10)
+                        {
+                            TargX.Add(shx + (CatFacing[kitn] ? 2 : -2));
+                            TargY.Add(shy - 1);
+                            TargCol.Add(cc);
+                        }
+                    }
+                }
+            }
+        }
+        Debug.Log(TargX.Join(",") + " : " + TargY.Join(",") + " : " + TargCol.Join(","));
     }
  
     void TargetPress(KMSelectable TS)
@@ -345,11 +404,11 @@ public class laserLuringScript : MonoBehaviour
     {
         TryAgain:
         var shelfList = new List<int>();
-        int shelfWidth = 5;
+        int SHELF_WIDTH = 5;
         var randomPositions = Enumerable.Range(0, SHELF_COUNT).Select(i => Rnd.Range(0, SQ_ACROSS * SQ_TALL)).ToArray();
 
         // If the X position is too far right
-        if (randomPositions.Any(num => num % SQ_ACROSS > SQ_ACROSS - (shelfWidth + 1)))
+        if (randomPositions.Any(num => num % SQ_ACROSS > SQ_ACROSS - (SHELF_WIDTH + 1)))
             goto TryAgain;
 
         // If the Y position is too high or too low
@@ -486,7 +545,7 @@ public class laserLuringScript : MonoBehaviour
                     {
                         if (standablePositions.Contains(qi.Index.Position))
                             f.InAirDuration = 0;
-                        if (f.InAirDuration <= MAX_IN_AIR_DURATION)
+                        if (f.InAirDuration <= IN_AIR_DURATION)
                             q.Enqueue(new QueueItem(f, qi.Index));
                     }
                 }
@@ -498,7 +557,7 @@ public class laserLuringScript : MonoBehaviour
                     {
                         if (standablePositions.Contains(qi.Index.Position))
                             f.InAirDuration = 0;
-                        if (f.InAirDuration <= MAX_IN_AIR_DURATION)
+                        if (f.InAirDuration <= IN_AIR_DURATION)
                             q.Enqueue(new QueueItem(f, qi.Index));
                     }
                 }
@@ -510,7 +569,7 @@ public class laserLuringScript : MonoBehaviour
                     {
                         if (standablePositions.Contains(qi.Index.Position))
                             f.InAirDuration = 0;
-                        if (f.InAirDuration <= MAX_IN_AIR_DURATION)
+                        if (f.InAirDuration <= IN_AIR_DURATION)
                             q.Enqueue(new QueueItem(f, qi.Index));
                     }
                 }
@@ -537,4 +596,6 @@ public class laserLuringScript : MonoBehaviour
         slot.flipX = fx;
         slot.flipY = fy;
     }
+
+    //SetTarget function goes here
 }
