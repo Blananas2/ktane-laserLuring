@@ -56,8 +56,12 @@ public class laserLuringScript : MonoBehaviour
     int[][] orders = new int[][] { new int[] { 0, 1, 2 }, new int[] { 0, 2, 1 }, new int[] { 1, 0, 2 }, new int[] { 1, 2, 0 }, new int[] { 2, 0, 1 }, new int[] { 2, 1, 0 } };
     int orderIx = -1;
     private int[] cyclingCursorColors = new int[CURSOR_LIMIT];
-
+    bool animating = false;
+    List<int> TargX = new List<int> { };
+    List<int> TargY = new List<int> { };
+    List<int> TargCol = new List<int> { };
     private int[] ShelfPositions = new int[SQ_ACROSS * SQ_TALL];
+    bool[] catSatisfaction = { false, false, false };
 
     //Logging
     static int moduleIdCounter = 1;
@@ -91,6 +95,11 @@ public class laserLuringScript : MonoBehaviour
         {
             Lights[l].range *= scalar;
             Lights[l].gameObject.SetActive(false);
+        }
+
+        for (int ts = 0; ts < CURSOR_LIMIT; ts++)
+        {
+            TargetSels[ts].gameObject.SetActive(false);
         }
 
         orderIx = Rnd.Range(0, 6);
@@ -164,12 +173,13 @@ public class laserLuringScript : MonoBehaviour
 
     void PlaceTargets(int chnl)
     {
-        List<int> TargX = new List<int> { };
-        List<int> TargY = new List<int> { };
-        List<int> TargCol = new List<int> { };
+        TargX.Clear();
+        TargY.Clear();
+        TargCol.Clear();
 
         for (int kitn = 0; kitn < 3; kitn++)
         {
+            if (catSatisfaction[kitn]) { continue; }
             int cc = ChosenCollars[kitn];
             
             if ((cc & (int)Math.Pow(2, 2-chnl)) == (int)Math.Pow(2, 2-chnl)) //collar check; all i had to do in previous crashout was this hsjkdhsadjkdhsjkal
@@ -182,6 +192,13 @@ public class laserLuringScript : MonoBehaviour
                     TargX.Add(CatPosX[kitn] + (CatFacing[kitn] ? -3 : 3));
                     TargY.Add(18);
                     TargCol.Add(cc);
+                } else //othw put a target on the floor
+                {
+                    if ((CatFacing[kitn] && CatPosX[kitn] == 0) || (!CatFacing[kitn] && CatPosX[kitn] == 28)) { continue; } //oob check
+
+                    TargX.Add(CatPosX[kitn] + (CatFacing[kitn] ? -1 : 1));
+                    TargY.Add(18);
+                    TargCol.Add(cc);
                 }
 
                 for (int shelf = 0; shelf < SHELF_COUNT; shelf++)
@@ -190,10 +207,18 @@ public class laserLuringScript : MonoBehaviour
                     int shy = ShelfPositions[shelf] / SQ_ACROSS;
                     
                     //if the cat is on a shelf with an item (shelf ix < 3), place a target on the item (1 tile above shelf)
-                    //TODO: rewrite slightly to account for facing direction
-                    if (shelf < 3 && CatPosY[kitn] == shy - 1 && Math.Abs(CatPosX[kitn] - shx) < 3)
+                    if (shelf < 3 && CatPosY[kitn] == shy - 1 && Math.Abs(CatPosX[kitn] - shx) < 3 && 
+                    ((CatFacing[kitn] && shx < CatPosX[kitn]) || (!CatFacing[kitn] && shx > CatPosX[kitn])))
                     {
                         TargX.Add(shx);
+                        TargY.Add(shy-1);
+                        TargCol.Add(cc);
+                    }
+
+                    //if the cat is on one end of the shelf, facing towards the other end, place a target at the other end
+                    if (CatPosY[kitn] == shy - 1 && CatPosX[kitn] == shx + (CatFacing[kitn] ? 2 : -2))
+                    {
+                        TargX.Add(shx + (CatFacing[kitn] ? -2 : 2));
                         TargY.Add(shy-1);
                         TargCol.Add(cc);
                     }
@@ -224,14 +249,21 @@ public class laserLuringScript : MonoBehaviour
         }
         for (int twerp = 0; twerp < CURSOR_LIMIT; twerp++)
         {
-            int XY = TargX[twerp] + TargY[twerp] * SQ_ACROSS;
             if (twerp >= TargX.Count())
             {
                 SetSprite(-1, -1, 7, Slots[21+twerp], null, Color.white, false, false);
-            } else if (Occupied.Contains(XY)) {
+                cyclingCursorColors[twerp] = -1;
+                TargetSels[twerp].gameObject.SetActive(false);
+                continue;
+            }
+
+            int XY = TargX[twerp] + TargY[twerp] * SQ_ACROSS;
+
+            if (Occupied.Contains(XY)) {
                 SetSprite(-1, -1, 7, Slots[21+twerp], null, Color.white, false, false);
                 Buckets[Occupied.IndexOf(XY)]++;
                 Scheme[Occupied.IndexOf(XY)] *= IAmScheming[TargCol[twerp]-1];
+                cyclingCursorColors[twerp] = -1;
             } else 
             {
                 SetSprite(TargX[twerp], TargY[twerp], 7, Slots[21+twerp], OtherSprites[0], COLORS_PROPER[TargCol[twerp]], false, false);
@@ -239,8 +271,11 @@ public class laserLuringScript : MonoBehaviour
                 Buckets.Add(1);
                 Scheme.Add(IAmScheming[TargCol[twerp]-1]);
                 Six.Add(twerp);
+                cyclingCursorColors[twerp] = TargCol[twerp];
+                SetTarget(TargX[twerp], TargY[twerp], twerp);
             }
         }
+        if (Buckets.Count() == 0) { return; }
         TargetCycle = Buckets.Max();
         if (TargetCycle > 1)
         {
@@ -283,7 +318,68 @@ public class laserLuringScript : MonoBehaviour
  
     void TargetPress(KMSelectable TS)
     {
-        Debug.Log(TS);
+        if (animating) { return; }
+        for (int ing = 0; ing < CURSOR_LIMIT; ing++)
+        {
+            if (TS == TargetSels[ing])
+            {
+                StartCoroutine(MoveCat(ing));
+            }
+        }
+    }
+
+    private IEnumerator MoveCat(int meow)
+    {
+        animating = true;
+
+        int who = Array.IndexOf(ChosenCollars, cyclingCursorColors[meow]);
+        int whereX = TargX[meow];
+        int whereY = TargY[meow];
+
+        float elapsed = 0f;
+        if (CatPosY[who] == whereY && (Math.Abs(CatPosX[who] - whereX) < 7 || whereY == 18)) //walk
+        {
+            float duration = 1f;
+            while (elapsed < duration)
+            {
+                SetSprite(Lerp(CatPosX[who], whereX, elapsed), whereY - 1, 3 + who, Slots[who], CatSprites[ChosenCats[who] * 10 + (int)Math.Floor(elapsed * 8) + 1], Color.white, CatFacing[who], false);
+                SetSprite(Lerp(CatPosX[who], whereX, elapsed), whereY - 1, 6, Slots[who + 3], OtherSprites[2], COLORS_PROPER[ChosenCollars[who]], CatFacing[who], false);
+                yield return null;
+                elapsed += Time.deltaTime;
+            }
+        } else //pounce
+        {
+            SetSprite(whereX, whereY - 1, 3 + who, Slots[who], CatSprites[ChosenCats[who] * 10], Color.white, CatFacing[who], false); //placeholder
+
+        }
+
+        SetSprite(whereX, whereY - 1, 3 + who, Slots[who], CatSprites[ChosenCats[who] * 10], Color.white, CatFacing[who], false);
+        SetSprite(whereX, whereY - 1, 6, Slots[who + 3], OtherSprites[1], COLORS_PROPER[ChosenCollars[who]], CatFacing[who], false);
+
+        CatPosX[who] = whereX;
+        CatPosY[who] = whereY;
+
+        for (int sus = 0; sus < SHELF_COUNT; sus++)
+        {
+            if (ShelfPositions[sus] - SQ_ACROSS == CatPosX[who] + CatPosY[who] * SQ_ACROSS)
+            {
+                if (orders[orderIx][who] == sus)
+                {
+                    Debug.Log("coreggt");
+                } else
+                {
+                    Debug.Log("wrogn");
+                }
+            }
+        }
+
+        PlaceTargets(LaserColor ?? 0); //compiler shut up i know what i am doing
+        animating = false;
+    }
+
+    float Lerp(float a, float b, float t)
+    { //this assumes t is in the range 0-1
+        return a * (1f - t) + b * t;
     }
 
     void GeneratePuzzle()
@@ -662,4 +758,9 @@ public class laserLuringScript : MonoBehaviour
     }
 
     //SetTarget function goes here
+    void SetTarget(int x, int y, int ix)
+    {
+        TargetSels[ix].gameObject.SetActive(true);
+        TargetSels[ix].gameObject.transform.localPosition = new Vector3(LEFT_EDGE + x * GRID_SQ, 0.0103f, TOP_EDGE - y * GRID_SQ);
+    }
 }
