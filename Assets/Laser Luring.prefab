@@ -4742,6 +4742,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 289730f7b5520584d821577a04a910ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Module: {fileID: 114853960920223876}
   Bomb: {fileID: 114454383462897410}
   Audio: {fileID: 114915473299363512}
   Buttons:
@@ -4792,7 +4793,7 @@ MonoBehaviour:
   - {fileID: 21300010, guid: c465a9c981d7e434e9dd5b93b5798f47, type: 3}
   - {fileID: 21300012, guid: c465a9c981d7e434e9dd5b93b5798f47, type: 3}
   - {fileID: 21300014, guid: c465a9c981d7e434e9dd5b93b5798f47, type: 3}
-  - {fileID: 0}
+  - {fileID: 21300000, guid: 56c800c5436d45f4bb7c7d9de8bfe727, type: 3}
   - {fileID: 21300000, guid: ffd810734decbb840985e138fe2750eb, type: 3}
   - {fileID: 21300000, guid: 1e6b8bade0d05e548a6b3a0a417a316f, type: 3}
   - {fileID: 21300002, guid: 1e6b8bade0d05e548a6b3a0a417a316f, type: 3}
@@ -4934,7 +4935,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 06b304768733b6e498aabd520c4d7811, type: 3}
   - {fileID: 0}
   - {fileID: 21300000, guid: 0655b321cf6f44d45af7ae5d2945a831, type: 3}
-  - {fileID: 0}
+  - {fileID: 21300000, guid: 6003007189bf1e7468955e49472f7f70, type: 3}
   - {fileID: 21300000, guid: 5a42ed7fb09c8f746a2a0861412f6f19, type: 3}
   Slots:
   - {fileID: 212442303407070968}

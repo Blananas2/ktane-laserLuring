@@ -43,7 +43,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
     string[] ITEM_NAMES = { "vase of flowers", "Wither painting", "trophy", "piggy bank", "not X01 dartboard", "water bottle", "alarm clock", "American flag", "Rubik's cube", "spray bottle", "soda can", "microphone", "VVVVVV", "letter board", "fez", "bobblehead", "Rubik's clock", "rubber duck", "wooden blocks", "meeple", "strawberry jam", "Unown F", "jar with coins", "hard hat", "joker card", "toy ship", "Zed dog", "crewmate", "whiteboard", "peashooter", "PlayStation 5", "birthday sign", "pocket watch", "baseball", "Wii remote", "xmas mat", "jewel", "creeper", "walkie-talkie", "Luxo ball", "toy tank", "maneater", "rum and glass", "deny stamp", "approve stamp", "top hat", "calendar", "chicken", "watering can", "balloon", "glasses", "toy car", "flask", "drinking bird", "oppie", "C tile", "dust bunny", "Maxwell's notebook", "Mort the chicken", "triforce", "portable lantern", "wireframe ball", "20 tile", "infinity gauntlet" };
     int[][] itemWH = new int[][] {
         new int[] {1,3}, new int[] {2,2}, new int[] {2,2}, new int[] {2,1}, new int[] {3,3}, new int[] {1,1}, new int[] {2,1}, new int[] {1,2},
-        new int[] {1,2}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,2}, new int[] {2,2}, new int[] {1,1}, new int[] {1,1},
+        new int[] {1,1}, new int[] {1,2}, new int[] {1,1}, new int[] {1,1}, new int[] {1,2}, new int[] {2,2}, new int[] {1,1}, new int[] {1,1},
         new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {2,1},
         new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {3,2}, new int[] {1,1}, new int[] {1,3}, new int[] {3,1},
         new int[] {1,1}, new int[] {1,1}, new int[] {1,2}, new int[] {2,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,2}, new int[] {2,2},
@@ -132,6 +132,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
 
     void ButtonPress(KMSelectable BS)
     {
+        BS.AddInteractionPunch(0.5f);
         if (moduleSolved) { return; }
         for (int btn = 0; btn < 3; btn++)
         {
@@ -347,18 +348,24 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
         float elapsed = 0f;
         if (CatPosY[who] == whereY && (Math.Abs(CatPosX[who] - whereX) < 7 || whereY == 18)) //walk
         {
-            float duration = 1f;
+            float duration = 0.75f;
             while (elapsed < duration)
             {
-                SetSprite(Lerp(CatPosX[who], whereX, elapsed), whereY - 1, 3 + who * 2, Slots[who], CatSprites[ChosenCats[who] * 10 + (int)Math.Floor(elapsed * 8) + 1], Color.white, CatFacing[who], false);
-                SetSprite(Lerp(CatPosX[who], whereX, elapsed), whereY - 1, 4 + who * 2, Slots[who + 3], OtherSprites[2], COLORS_PROPER[ChosenCollars[who]], CatFacing[who], false);
+                SetSprite(Lerp(CatPosX[who], whereX, elapsed / duration), whereY - 1, 3 + who * 2, Slots[who], CatSprites[ChosenCats[who] * 10 + (int)Math.Floor(elapsed * 8) + 1], Color.white, CatFacing[who], false);
+                SetSprite(Lerp(CatPosX[who], whereX, elapsed / duration), whereY - 1, 4 + who * 2, Slots[who + 3], OtherSprites[2], COLORS_PROPER[ChosenCollars[who]], CatFacing[who], false);
                 yield return null;
                 elapsed += Time.deltaTime;
             }
         } else //pounce
         {
-            elapsed = 0.2f;
-
+            float duration = 0.3f;
+            while (elapsed < duration)
+            {
+                SetSprite(Lerp(CatPosX[who] + 0.5f, whereX + 0.5f, elapsed / duration), Lerp(CatPosY[who], whereY, elapsed / duration), 3 + who * 2, Slots[who], CatSprites[ChosenCats[who] * 10 + 9], Color.white, CatFacing[who], false);
+                SetSprite(Lerp(CatPosX[who] + 0.5f, whereX + 0.5f, elapsed / duration), Lerp(CatPosY[who], whereY, elapsed / duration), 4 + who * 2, Slots[who + 3], OtherSprites[3], COLORS_PROPER[ChosenCollars[who]], CatFacing[who], false);
+                yield return null;
+                elapsed += Time.deltaTime;
+            }
         }
 
         SetSprite(whereX, whereY - 1, 3 + who * 2, Slots[who], CatSprites[ChosenCats[who] * 10], Color.white, CatFacing[who], false);

@@ -19,13 +19,12 @@ Cat Sprites:
 {May adjust formula later; will likely add more breeds}
 
 Item Sprites are in reading order in the manual
-Note that care needs to be taken to go from original coord => item bc of the extra step
 
 Other Sprites:
 0 = Target
 1 = Collar Sitting
 2 = Collar Walk Cycle
-3 = Collar Pouncing (undrawn)
+3 = Collar Pouncing
 4 = Laser
 5 = Cat Smile
 6 = Shelf
@@ -42,7 +41,7 @@ Layers:
 0 = Background
 1 = Shelves
 2 = Items
-3-8 = Cats/Collars (Alternating)
+3-8 = Cats/Collars [alternating]
 9 = Targets, Lasers, Smiles
 100 = Debug
 
