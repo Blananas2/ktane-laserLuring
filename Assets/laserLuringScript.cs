@@ -7,9 +7,9 @@ using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
 
-public class laserLuringScript : MonoBehaviour
+public class laserLuringScript : MonoBehaviour //many many variable names in this script are nonsensical, i'm so sorry that this is how my brain operates
 {
-
+    public KMBombModule Module;
     public KMBombInfo Bomb;
     public KMAudio Audio;
 
@@ -40,6 +40,7 @@ public class laserLuringScript : MonoBehaviour
     private const int IN_AIR_DURATION = 10;
     private const int SHELF_COUNT = 9;
     private const int CURSOR_LIMIT = 9; //increase if i need it to; just ensure i also add the correct number of slots and targetsels
+    string[] ITEM_NAMES = { "vase of flowers", "Wither painting", "trophy", "piggy bank", "not X01 dartboard", "water bottle", "alarm clock", "American flag", "Rubik's cube", "spray bottle", "soda can", "microphone", "VVVVVV", "letter board", "fez", "bobblehead", "Rubik's clock", "rubber duck", "wooden blocks", "meeple", "strawberry jam", "Unown F", "jar with coins", "hard hat", "joker card", "toy ship", "Zed dog", "crewmate", "whiteboard", "peashooter", "PlayStation 5", "birthday sign", "pocket watch", "baseball", "Wii remote", "xmas mat", "jewel", "creeper", "walkie-talkie", "Luxo ball", "toy tank", "maneater", "rum and glass", "deny stamp", "approve stamp", "top hat", "calendar", "chicken", "watering can", "balloon", "glasses", "toy car", "flask", "drinking bird", "oppie", "C tile", "dust bunny", "Maxwell's notebook", "Mort the chicken", "triforce", "portable lantern", "wireframe ball", "20 tile", "infinity gauntlet" };
     int[][] itemWH = new int[][] {
         new int[] {1,3}, new int[] {2,2}, new int[] {2,2}, new int[] {2,1}, new int[] {3,3}, new int[] {1,1}, new int[] {2,1}, new int[] {1,2},
         new int[] {1,2}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,2}, new int[] {2,2}, new int[] {1,1}, new int[] {1,1},
@@ -74,7 +75,6 @@ public class laserLuringScript : MonoBehaviour
 
         foreach (KMSelectable Button in Buttons)
         {
-            Button.OnHighlight += delegate () { /*ButtonHover(Button);*/ };
             Button.OnInteract += delegate () { ButtonPress(Button); return false; };
         }
 
@@ -82,9 +82,6 @@ public class laserLuringScript : MonoBehaviour
         {
             TargetSel.OnInteract += delegate () { TargetPress(TargetSel); return false; };
         }
-
-        //button.OnInteract += delegate () { buttonPress(); return false; };
-
     }
 
     // Use this for initialization
@@ -115,8 +112,8 @@ public class laserLuringScript : MonoBehaviour
         {
             bool flipEm = Rnd.Range(0, 2) == 0;
             CatFacing[m] = flipEm;
-            SetSprite(CatPosX[m], 17, 3 + m, Slots[m], CatSprites[ChosenCats[m] * 10], Color.white, flipEm, false);
-            SetSprite(CatPosX[m], 17, 6, Slots[m + 3], OtherSprites[1], COLORS_PROPER[ChosenCollars[m]], flipEm, false);
+            SetSprite(CatPosX[m], 17, 3 + m * 2, Slots[m], CatSprites[ChosenCats[m] * 10], Color.white, flipEm, false);
+            SetSprite(CatPosX[m], 17, 4 + m * 2, Slots[m + 3], OtherSprites[1], COLORS_PROPER[ChosenCollars[m]], flipEm, false);
         }
 
         ShelfPositions = GenerateShelves();
@@ -135,6 +132,7 @@ public class laserLuringScript : MonoBehaviour
 
     void ButtonPress(KMSelectable BS)
     {
+        if (moduleSolved) { return; }
         for (int btn = 0; btn < 3; btn++)
         {
             if (Buttons[btn] == BS)
@@ -156,8 +154,12 @@ public class laserLuringScript : MonoBehaviour
                     if (whatthefuck[btn].Contains(ChosenCollars[catplant])) //check for if cat has the right component; it may have taken one entire crashout to reach this point
                     {
                         CatFacing[catplant] = !CatFacing[catplant];
-                        SetSprite(CatPosX[catplant], CatPosY[catplant] - 1, 3 + catplant, Slots[catplant], CatSprites[ChosenCats[catplant] * 10], Color.white, CatFacing[catplant], false);
-                        SetSprite(CatPosX[catplant], CatPosY[catplant] - 1, 6, Slots[catplant + 3], OtherSprites[1], COLORS_PROPER[ChosenCollars[catplant]], CatFacing[catplant], false);
+                        SetSprite(CatPosX[catplant], CatPosY[catplant] - 1, 3 + catplant * 2, Slots[catplant], CatSprites[ChosenCats[catplant] * 10], Color.white, CatFacing[catplant], false);
+                        SetSprite(CatPosX[catplant], CatPosY[catplant] - 1, 4 + catplant * 2, Slots[catplant + 3], OtherSprites[1], COLORS_PROPER[ChosenCollars[catplant]], CatFacing[catplant], false);
+                        if (catSatisfaction[catplant])
+                        {
+                            SetSprite(CatPosX[catplant], CatPosY[catplant] - 1, 9, Slots[6 + catplant], OtherSprites[5], Color.white, CatFacing[catplant], false);
+                        }
                         break;
                     }
                 }
@@ -266,7 +268,7 @@ public class laserLuringScript : MonoBehaviour
                 cyclingCursorColors[twerp] = -1;
             } else 
             {
-                SetSprite(TargX[twerp], TargY[twerp], 7, Slots[21+twerp], OtherSprites[0], COLORS_PROPER[TargCol[twerp]], false, false);
+                SetSprite(TargX[twerp], TargY[twerp], 9, Slots[21+twerp], OtherSprites[0], COLORS_PROPER[TargCol[twerp]], false, false);
                 Occupied.Add(XY);
                 Buckets.Add(1);
                 Scheme.Add(IAmScheming[TargCol[twerp]-1]);
@@ -310,7 +312,7 @@ public class laserLuringScript : MonoBehaviour
         while (true)
         {
             cycle = (cycle + 1) % numb;
-            SetSprite(x, y, 7, Slots[21 + slotIx], OtherSprites[0], COLORS_PROPER[untethered[cycle]], false, false);
+            SetSprite(x, y, 9, Slots[21 + slotIx], OtherSprites[0], COLORS_PROPER[untethered[cycle]], false, false);
             cyclingCursorColors[slotIx] = untethered[cycle];
             yield return new WaitForSeconds(1f);
         }
@@ -323,6 +325,7 @@ public class laserLuringScript : MonoBehaviour
         {
             if (TS == TargetSels[ing])
             {
+
                 StartCoroutine(MoveCat(ing));
             }
         }
@@ -336,25 +339,30 @@ public class laserLuringScript : MonoBehaviour
         int whereX = TargX[meow];
         int whereY = TargY[meow];
 
+        for (int weirdth = 0; weirdth < CURSOR_LIMIT; weirdth++)
+        {
+            SetSprite(whereX, whereY, 9, Slots[21 + weirdth], weirdth == meow ? OtherSprites[4] : null, COLORS_PROPER[LaserColor == 0 ? 4 : LaserColor == 1 ? 2 : 1], false, false);
+        }
+
         float elapsed = 0f;
         if (CatPosY[who] == whereY && (Math.Abs(CatPosX[who] - whereX) < 7 || whereY == 18)) //walk
         {
             float duration = 1f;
             while (elapsed < duration)
             {
-                SetSprite(Lerp(CatPosX[who], whereX, elapsed), whereY - 1, 3 + who, Slots[who], CatSprites[ChosenCats[who] * 10 + (int)Math.Floor(elapsed * 8) + 1], Color.white, CatFacing[who], false);
-                SetSprite(Lerp(CatPosX[who], whereX, elapsed), whereY - 1, 6, Slots[who + 3], OtherSprites[2], COLORS_PROPER[ChosenCollars[who]], CatFacing[who], false);
+                SetSprite(Lerp(CatPosX[who], whereX, elapsed), whereY - 1, 3 + who * 2, Slots[who], CatSprites[ChosenCats[who] * 10 + (int)Math.Floor(elapsed * 8) + 1], Color.white, CatFacing[who], false);
+                SetSprite(Lerp(CatPosX[who], whereX, elapsed), whereY - 1, 4 + who * 2, Slots[who + 3], OtherSprites[2], COLORS_PROPER[ChosenCollars[who]], CatFacing[who], false);
                 yield return null;
                 elapsed += Time.deltaTime;
             }
         } else //pounce
         {
-            SetSprite(whereX, whereY - 1, 3 + who, Slots[who], CatSprites[ChosenCats[who] * 10], Color.white, CatFacing[who], false); //placeholder
+            elapsed = 0.2f;
 
         }
 
-        SetSprite(whereX, whereY - 1, 3 + who, Slots[who], CatSprites[ChosenCats[who] * 10], Color.white, CatFacing[who], false);
-        SetSprite(whereX, whereY - 1, 6, Slots[who + 3], OtherSprites[1], COLORS_PROPER[ChosenCollars[who]], CatFacing[who], false);
+        SetSprite(whereX, whereY - 1, 3 + who * 2, Slots[who], CatSprites[ChosenCats[who] * 10], Color.white, CatFacing[who], false);
+        SetSprite(whereX, whereY - 1, 4 + who * 2, Slots[who + 3], OtherSprites[1], COLORS_PROPER[ChosenCollars[who]], CatFacing[who], false);
 
         CatPosX[who] = whereX;
         CatPosY[who] = whereY;
@@ -363,16 +371,27 @@ public class laserLuringScript : MonoBehaviour
         {
             if (ShelfPositions[sus] - SQ_ACROSS == CatPosX[who] + CatPosY[who] * SQ_ACROSS)
             {
-                if (orders[orderIx][who] == sus)
+                if (orders[orderIx][sus] == who)
                 {
-                    Debug.Log("coreggt");
+                    Debug.LogFormat("[Laser Luring #{0}] {1} knocking over {2} is correct.", moduleId, CAT_NAMES[ChosenCats[who]], ITEM_NAMES[itemIxs[orders[orderIx][sus]]]);
+                    catSatisfaction[who] = true;
+                    SetSprite(whereX, whereY - 1, 9, Slots[6 + who], OtherSprites[5], Color.white, CatFacing[who], false);
+                    // later polish step: place a 'fallen' item directly underneath where it was originally placed
+                    if (catSatisfaction[0] && catSatisfaction[1] && catSatisfaction[2])
+                    {
+                        Debug.LogFormat("[Laser Luring #{0}] Cat curiosity satisfied, module solved.", moduleId);
+                        Module.HandlePass();
+                        moduleSolved = true;
+                    }
                 } else
                 {
-                    Debug.Log("wrogn");
+                    Debug.LogFormat("[Laser Luring #{0}] {1} is not interested in {2}, strike!", moduleId, CAT_NAMES[ChosenCats[who]], ITEM_NAMES[itemIxs[orders[orderIx][sus]]]);
+                    Module.HandleStrike();
                 }
             }
         }
 
+        SetSprite(whereX, whereY, 9, Slots[21 + meow], null, Color.white, false, false);
         PlaceTargets(LaserColor ?? 0); //compiler shut up i know what i am doing
         animating = false;
     }
@@ -413,7 +432,7 @@ public class laserLuringScript : MonoBehaviour
         Debug.LogFormat("[Laser Luring #{0}] {1}'s initial position: Row {2}, Column {3}", moduleId, CAT_NAMES[ChosenCats[0]], catInitSplit[0], catInitSplit[3]);
         Debug.LogFormat("[Laser Luring #{0}] {1}'s initial position: Row {2}, Column {3}", moduleId, CAT_NAMES[ChosenCats[1]], catInitSplit[1], catInitSplit[4]);
         Debug.LogFormat("[Laser Luring #{0}] {1}'s initial position: Row {2}, Column {3}", moduleId, CAT_NAMES[ChosenCats[2]], catInitSplit[2], catInitSplit[5]);
-        Debug.LogFormat("[Laser Luring #{0}] Favorite items: i{1} for {2}, i{3} for {4}, i{5} for {6}", moduleId, itemIxs[0], CAT_NAMES[ChosenCats[0]], itemIxs[1], CAT_NAMES[ChosenCats[1]], itemIxs[2], CAT_NAMES[ChosenCats[2]]);
+        Debug.LogFormat("[Laser Luring #{0}] Favorite items: {1} for {2}, {3} for {4}, {5} for {6}", moduleId, ITEM_NAMES[itemIxs[0]], CAT_NAMES[ChosenCats[0]], ITEM_NAMES[itemIxs[1]], CAT_NAMES[ChosenCats[1]], ITEM_NAMES[itemIxs[2]], CAT_NAMES[ChosenCats[2]]);
     }
 
     int[] CalcInits(int[] catV, int[] colV)
@@ -741,12 +760,6 @@ public class laserLuringScript : MonoBehaviour
         return true;
     }
 
-    /*
-    void buttonPress() {
-
-    }
-    */
-
     void SetSprite(float xp, float yp, int zp, SpriteRenderer slot, Sprite spr, Color col, bool fx, bool fy)
     {
         slot.sprite = spr;
@@ -757,7 +770,6 @@ public class laserLuringScript : MonoBehaviour
         slot.flipY = fy;
     }
 
-    //SetTarget function goes here
     void SetTarget(int x, int y, int ix)
     {
         TargetSels[ix].gameObject.SetActive(true);

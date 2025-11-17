@@ -22,7 +22,7 @@ Item Sprites are in reading order in the manual
 Note that care needs to be taken to go from original coord => item bc of the extra step
 
 Other Sprites:
-0 = Cursor
+0 = Target
 1 = Collar Sitting
 2 = Collar Walk Cycle
 3 = Collar Pouncing (undrawn)
@@ -36,15 +36,14 @@ Slots:
 6-8 = Smiles
 9-17 = Shelves
 18-20 = Items
-21-29 = Cursors
+21-29 = Targets
 
 Layers:
 0 = Background
 1 = Shelves
 2 = Items
-3,4,5 = Cats
-6 = Collars, Smiles
-7 = Cursors
+3-8 = Cats/Collars (Alternating)
+9 = Targets, Lasers, Smiles
 100 = Debug
 
 === Item references ===

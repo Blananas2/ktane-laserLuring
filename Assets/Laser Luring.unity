@@ -298,9 +298,26 @@ Prefab:
       propertyPath: m_RootOrder
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 114875707485168950, guid: 85a2c623b85c45f4fbcbd5bedc7a4b15,
+        type: 2}
+      propertyPath: Module
+      value: 
+      objectReference: {fileID: 1540661709}
+    - target: {fileID: 114875707485168950, guid: 85a2c623b85c45f4fbcbd5bedc7a4b15,
+        type: 2}
+      propertyPath: OtherSprites.Array.data[5]
+      value: 
+      objectReference: {fileID: 21300000, guid: 6003007189bf1e7468955e49472f7f70,
+        type: 3}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 85a2c623b85c45f4fbcbd5bedc7a4b15, type: 2}
   m_IsPrefabParent: 0
+--- !u!114 &1540661709 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114853960920223876, guid: 85a2c623b85c45f4fbcbd5bedc7a4b15,
+    type: 2}
+  m_PrefabInternal: {fileID: 1191093489}
+  m_Script: {fileID: -119419473, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
 --- !u!1001 &2006525007
 Prefab:
   m_ObjectHideFlags: 0
