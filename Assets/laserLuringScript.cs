@@ -39,6 +39,7 @@ public class laserLuringScript : MonoBehaviour
     private const int SQ_TALL = 19;
     private const int IN_AIR_DURATION = 10;
     private const int SHELF_COUNT = 9;
+    private const int CURSOR_LIMIT = 9; //increase if i need it to; just ensure i also add the correct number of slots and targetsels
     int[][] itemWH = new int[][] {
         new int[] {1,3}, new int[] {2,2}, new int[] {2,2}, new int[] {2,1}, new int[] {3,3}, new int[] {1,1}, new int[] {2,1}, new int[] {1,2},
         new int[] {1,2}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,2}, new int[] {2,2}, new int[] {1,1}, new int[] {1,1},
@@ -49,10 +50,12 @@ public class laserLuringScript : MonoBehaviour
         new int[] {1,1}, new int[] {1,2}, new int[] {2,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,3}, new int[] {1,1}, new int[] {1,1},
         new int[] {1,1}, new int[] {1,1}, new int[] {1,2}, new int[] {1,1}, new int[] {2,3}, new int[] {2,2}, new int[] {1,1}, new int[] {1,2} 
     };
+    int[] IAmScheming = { 2, 3, 5, 7, 11, 13, 17 };
     int[] conv = { 36, 32, 37, 33, 38, 34, 39, 35, 4, 0, 5, 1, 6, 2, 7, 3, 44, 40, 45, 41, 46, 42, 47, 43, 12, 8, 13, 9, 14, 10, 15, 11, 52, 48, 53, 49, 54, 50, 55, 51, 20, 16, 21, 17, 22, 18, 23, 19, 60, 56, 61, 57, 62, 58, 63, 59, 28, 24, 29, 25, 30, 26, 31, 27 };
     int[] itemIxs = { -1, -1, -1 };
     int[][] orders = new int[][] { new int[] { 0, 1, 2 }, new int[] { 0, 2, 1 }, new int[] { 1, 0, 2 }, new int[] { 1, 2, 0 }, new int[] { 2, 0, 1 }, new int[] { 2, 1, 0 } };
     int orderIx = -1;
+    private int[] cyclingCursorColors = new int[CURSOR_LIMIT];
 
     private int[] ShelfPositions = new int[SQ_ACROSS * SQ_TALL];
 
@@ -165,16 +168,12 @@ public class laserLuringScript : MonoBehaviour
         List<int> TargY = new List<int> { };
         List<int> TargCol = new List<int> { };
 
-        TargetCycle = 0;
-
         for (int kitn = 0; kitn < 3; kitn++)
         {
             int cc = ChosenCollars[kitn];
             
             if ((cc & (int)Math.Pow(2, 2-chnl)) == (int)Math.Pow(2, 2-chnl)) //collar check; all i had to do in previous crashout was this hsjkdhsadjkdhsjkal
             {
-                TargetCycle++;
-
                 //if the cat is on the ground (posY == 18), place a target 3 spaces in front (take into account facing direction; ENSURE CAT CAN'T ESCAPE ROOM THAT WOULD BE BAD)
                 if (CatPosY[kitn] == 18)
                 {
@@ -201,10 +200,8 @@ public class laserLuringScript : MonoBehaviour
 
                     if ((CatFacing[kitn] && (shx < CatPosX[kitn] - 3)) || (!CatFacing[kitn] && (shx > CatPosX[kitn] + 3)))
                     {
-                        Debug.Log("<Laser Luring> Shelf " + shelf + " is in line of sight of cat " + kitn);
-                        
-                        //if manhattan distance between cat's current position and the target position is less than 10, add the target
-                        if ((Math.Abs((shx + (CatFacing[kitn] ? 2 : -2)) - CatPosX[kitn]) + Math.Abs((shy - 1) - CatPosY[kitn])) < 10)
+                        //if manhattan distance between cat's current position and the target position is within duration range, add the target
+                        if ((Math.Abs((shx + (CatFacing[kitn] ? 2 : -2)) - CatPosX[kitn]) + Math.Abs((shy - 1) - CatPosY[kitn])) <= IN_AIR_DURATION)
                         {
                             TargX.Add(shx + (CatFacing[kitn] ? 2 : -2));
                             TargY.Add(shy - 1);
@@ -214,7 +211,74 @@ public class laserLuringScript : MonoBehaviour
                 }
             }
         }
-        Debug.Log(TargX.Join(",") + " : " + TargY.Join(",") + " : " + TargCol.Join(","));
+
+        List<int> Occupied = new List<int> { };
+        List<int> Buckets = new List<int> { };
+        List<int> Scheme = new List<int> { };
+        List<int> Six = new List<int> { };
+        
+        //Debug.Log(TargX.Join(",") + " : " + TargY.Join(",") + " : " + TargCol.Join(","));
+        if (TargX.Count() > CURSOR_LIMIT)
+        {
+            Debug.LogFormat("[Laser Luring #{0}] ALERT BLAN OF ISSUE: CURSOR_LIMIT needs to be raised to at least {1}", moduleId, TargX.Count());
+        }
+        for (int twerp = 0; twerp < CURSOR_LIMIT; twerp++)
+        {
+            int XY = TargX[twerp] + TargY[twerp] * SQ_ACROSS;
+            if (twerp >= TargX.Count())
+            {
+                SetSprite(-1, -1, 7, Slots[21+twerp], null, Color.white, false, false);
+            } else if (Occupied.Contains(XY)) {
+                SetSprite(-1, -1, 7, Slots[21+twerp], null, Color.white, false, false);
+                Buckets[Occupied.IndexOf(XY)]++;
+                Scheme[Occupied.IndexOf(XY)] *= IAmScheming[TargCol[twerp]-1];
+            } else 
+            {
+                SetSprite(TargX[twerp], TargY[twerp], 7, Slots[21+twerp], OtherSprites[0], COLORS_PROPER[TargCol[twerp]], false, false);
+                Occupied.Add(XY);
+                Buckets.Add(1);
+                Scheme.Add(IAmScheming[TargCol[twerp]-1]);
+                Six.Add(twerp);
+            }
+        }
+        TargetCycle = Buckets.Max();
+        if (TargetCycle > 1)
+        {
+            for (int oq = 0; oq < Occupied.Count(); oq++)
+            {
+                if (Buckets[oq] > 1)
+                {
+                    StartCoroutine(CycleTargets(Occupied[oq] % SQ_ACROSS, Occupied[oq] / SQ_ACROSS, Buckets[oq], Scheme[oq], Six[oq]));
+                }
+            }
+        } else
+        {
+            StopAllCoroutines();
+        }
+    }
+
+    private IEnumerator CycleTargets(int x, int y, int numb, int hehehe, int slotIx)
+    {
+        int[] untethered = new int[numb];
+        int luigi = 0;
+        for (int wa = 0; wa < 7; wa++)
+        {
+            if (hehehe % IAmScheming[wa] == 0)
+            {
+                untethered[luigi] = wa + 1;
+                luigi++;
+            }
+        }
+
+        int cycle = -1;
+
+        while (true)
+        {
+            cycle = (cycle + 1) % numb;
+            SetSprite(x, y, 7, Slots[21 + slotIx], OtherSprites[0], COLORS_PROPER[untethered[cycle]], false, false);
+            cyclingCursorColors[slotIx] = untethered[cycle];
+            yield return new WaitForSeconds(1f);
+        }
     }
  
     void TargetPress(KMSelectable TS)
