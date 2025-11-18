@@ -351,14 +351,14 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
             float duration = 0.75f;
             while (elapsed < duration)
             {
-                SetSprite(Lerp(CatPosX[who], whereX, elapsed / duration), whereY - 1, 3 + who * 2, Slots[who], CatSprites[ChosenCats[who] * 10 + (int)Math.Floor(elapsed * 8) + 1], Color.white, CatFacing[who], false);
+                SetSprite(Lerp(CatPosX[who], whereX, elapsed / duration), whereY - 1, 3 + who * 2, Slots[who], CatSprites[ChosenCats[who] * 10 + (int)Math.Floor((elapsed / duration) * 8) + 1], Color.white, CatFacing[who], false);
                 SetSprite(Lerp(CatPosX[who], whereX, elapsed / duration), whereY - 1, 4 + who * 2, Slots[who + 3], OtherSprites[2], COLORS_PROPER[ChosenCollars[who]], CatFacing[who], false);
                 yield return null;
                 elapsed += Time.deltaTime;
             }
         } else //pounce
         {
-            float duration = 0.3f;
+            float duration = 0.2f;
             while (elapsed < duration)
             {
                 SetSprite(Lerp(CatPosX[who] + 0.5f, whereX + 0.5f, elapsed / duration), Lerp(CatPosY[who], whereY, elapsed / duration), 3 + who * 2, Slots[who], CatSprites[ChosenCats[who] * 10 + 9], Color.white, CatFacing[who], false);
@@ -383,9 +383,11 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
                     Debug.LogFormat("[Laser Luring #{0}] {1} knocking over {2} is correct.", moduleId, CAT_NAMES[ChosenCats[who]], ITEM_NAMES[itemIxs[orders[orderIx][sus]]]);
                     catSatisfaction[who] = true;
                     SetSprite(whereX, whereY - 1, 9, Slots[6 + who], OtherSprites[5], Color.white, CatFacing[who], false);
-                    // later polish step: place a 'fallen' item directly underneath where it was originally placed
+                    // TODO: (later polish step) place a 'fallen' item directly underneath where it was originally placed
+                    SetSprite(whereX, whereY, 2, Slots[18 + who], null, Color.white, false, false); //placeholder for the above
                     if (catSatisfaction[0] && catSatisfaction[1] && catSatisfaction[2])
                     {
+                        Lights[LaserColor ?? 0].gameObject.SetActive(false); //again, stop it compiler, you're pissing me off
                         Debug.LogFormat("[Laser Luring #{0}] Cat curiosity satisfied, module solved.", moduleId);
                         Module.HandlePass();
                         moduleSolved = true;
