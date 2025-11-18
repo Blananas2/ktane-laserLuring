@@ -15,8 +15,7 @@ Cat Sprites:
 	where A is the Action:
 		0 = Sitting
 		1-8 = Walk Cycle [ascending frame order]
-		9 = Pouncing (undrawn)
-{May adjust formula later; will likely add more breeds}
+		9 = Pouncing
 
 Item Sprites are in reading order in the manual
 
@@ -35,7 +34,7 @@ Slots:
 6-8 = Smiles
 9-17 = Shelves
 18-20 = Items
-21-29 = Targets
+21+ = Targets
 
 Layers:
 0 = Background

@@ -39,7 +39,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
     private const int SQ_TALL = 19;
     private const int IN_AIR_DURATION = 10;
     private const int SHELF_COUNT = 9;
-    private const int CURSOR_LIMIT = 9; //increase if i need it to; just ensure i also add the correct number of slots and targetsels
+    private const int CURSOR_LIMIT = 13; //increase if i need it to; just ensure i also add the correct number of slots and targetsels
     string[] ITEM_NAMES = { "vase of flowers", "Wither painting", "trophy", "piggy bank", "not X01 dartboard", "water bottle", "alarm clock", "American flag", "Rubik's cube", "spray bottle", "soda can", "microphone", "VVVVVV", "letter board", "fez", "bobblehead", "Rubik's clock", "rubber duck", "wooden blocks", "meeple", "strawberry jam", "Unown F", "jar with coins", "hard hat", "joker card", "toy ship", "Zed dog", "crewmate", "whiteboard", "peashooter", "PlayStation 5", "birthday sign", "pocket watch", "baseball", "Wii remote", "xmas mat", "jewel", "creeper", "walkie-talkie", "Luxo ball", "toy tank", "maneater", "rum and glass", "deny stamp", "approve stamp", "top hat", "calendar", "chicken", "watering can", "balloon", "glasses", "toy car", "flask", "drinking bird", "oppie", "C tile", "dust bunny", "Maxwell's notebook", "Mort the chicken", "triforce", "portable lantern", "wireframe ball", "20 tile", "infinity gauntlet" };
     int[][] itemWH = new int[][] {
         new int[] {1,3}, new int[] {2,2}, new int[] {2,2}, new int[] {2,1}, new int[] {3,3}, new int[] {1,1}, new int[] {2,1}, new int[] {1,2},
@@ -326,7 +326,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
         {
             if (TS == TargetSels[ing])
             {
-
+                StopAllCoroutines();
                 StartCoroutine(MoveCat(ing));
             }
         }
@@ -337,6 +337,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
         animating = true;
 
         int who = Array.IndexOf(ChosenCollars, cyclingCursorColors[meow]);
+        if (who == -1) { animating = false; yield break; } //yeah this can happen fsr
         int whereX = TargX[meow];
         int whereY = TargY[meow];
 
@@ -419,7 +420,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
         int[] powersOfTwo = { 4, 2, 1 }; //lazy but idgaf
         powersOfTwo = powersOfTwo.Shuffle();
         for (int q = 0; q < 3; q++) { ChosenCollars[q] = Rnd.Range(0, 8) | powersOfTwo[q]; } //the bitwise or ensures that each of the lasers can be used for different cats
-        if (ChosenCollars[0] == ChosenCollars[1] || ChosenCollars[0] == ChosenCollars[2] || ChosenCollars[1] == ChosenCollars[2]) { attpsButLess++; goto retry; }
+        if (ChosenCollars[0] == ChosenCollars[1] || ChosenCollars[0] == ChosenCollars[2] || ChosenCollars[1] == ChosenCollars[2] || (ChosenCollars[0] & ChosenCollars[1] & ChosenCollars[2]) != 0) { attpsButLess++; goto retry; } // the & check at the end here is due to stability issues when all three cats can be lured, if i suspect i can make a more robust system i'll remove it
         int[] catInitSplit = CalcInits(ChosenCats, ChosenCollars);
         int[] catInits = { catInitSplit[0] * 8 + catInitSplit[3], catInitSplit[1] * 8 + catInitSplit[4], catInitSplit[2] * 8 + catInitSplit[5] };
         if (catInits[0] == catInits[1] || catInits[0] == catInits[2] || catInits[1] == catInits[2] ||
