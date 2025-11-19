@@ -17,7 +17,7 @@ Cat Sprites:
 		1-8 = Walk Cycle [ascending frame order]
 		9 = Pouncing
 
-Item Sprites are in reading order in the manual
+Item Sprites are in reading order in the manual; front half is on shelf, back half (+64) is falling/floor
 
 Other Sprites:
 0 = Target

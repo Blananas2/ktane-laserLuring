@@ -64,6 +64,9 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
     private int[] ShelfPositions = new int[SQ_ACROSS * SQ_TALL];
     bool[] catSatisfaction = { false, false, false };
 
+    private LaserLuringSettings Settings = new LaserLuringSettings();
+    bool Bumpscocity;
+
     //Logging
     static int moduleIdCounter = 1;
     int moduleId;
@@ -72,6 +75,15 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
     void Awake()
     {
         moduleId = moduleIdCounter++;
+
+        if (!Application.isEditor) {
+            ModConfig<LaserLuringSettings> modConfig = new ModConfig<LaserLuringSettings>("LaserLuringSettings");
+            Settings = modConfig.Settings;
+            modConfig.Settings = Settings;   
+        }
+
+        Bumpscocity = Application.isEditor ? true : Settings.Bumpscocity;
+        Debug.LogFormat("<Laser Luring #{0}> Bumpscocity: {1}", moduleId, Bumpscocity);
 
         foreach (KMSelectable Button in Buttons)
         {
@@ -133,7 +145,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
     void ButtonPress(KMSelectable BS)
     {
         BS.AddInteractionPunch(0.5f);
-        if (moduleSolved) { return; }
+        if (moduleSolved || animating) { return; }
         for (int btn = 0; btn < 3; btn++)
         {
             if (Buttons[btn] == BS)
@@ -384,8 +396,17 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
                     Debug.LogFormat("[Laser Luring #{0}] {1} knocking over {2} is correct.", moduleId, CAT_NAMES[ChosenCats[who]], ITEM_NAMES[itemIxs[orders[orderIx][sus]]]);
                     catSatisfaction[who] = true;
                     SetSprite(whereX, whereY - 1, 9, Slots[6 + who], OtherSprites[5], Color.white, CatFacing[who], false);
-                    // TODO: (later polish step) place a 'fallen' item directly underneath where it was originally placed
-                    SetSprite(whereX, whereY, 2, Slots[18 + who], null, Color.white, false, false); //placeholder for the above
+                    
+                    elapsed = 0f;
+                    float duration = 0.017f * (18 - (whereY - 1));
+                    while (elapsed < duration)
+                    {
+                        SetSprite(whereX, Lerp(whereY - 1, 18, elapsed/duration), 2, Slots[18 + who], ItemSprites[64 + itemIxs[who]], Color.white, false, false);
+                        yield return null;
+                        elapsed += Time.deltaTime;
+                    }
+                    SetSprite(whereX, 18, 2, Slots[18 + who], ItemSprites[64 + itemIxs[who]], Color.white, false, false);
+
                     if (catSatisfaction[0] && catSatisfaction[1] && catSatisfaction[2])
                     {
                         Lights[LaserColor ?? 0].gameObject.SetActive(false); //again, stop it compiler, you're pissing me off
@@ -420,7 +441,8 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
         int[] powersOfTwo = { 4, 2, 1 }; //lazy but idgaf
         powersOfTwo = powersOfTwo.Shuffle();
         for (int q = 0; q < 3; q++) { ChosenCollars[q] = Rnd.Range(0, 8) | powersOfTwo[q]; } //the bitwise or ensures that each of the lasers can be used for different cats
-        if (ChosenCollars[0] == ChosenCollars[1] || ChosenCollars[0] == ChosenCollars[2] || ChosenCollars[1] == ChosenCollars[2] || (ChosenCollars[0] & ChosenCollars[1] & ChosenCollars[2]) != 0) { attpsButLess++; goto retry; } // the & check at the end here is due to stability issues when all three cats can be lured, if i suspect i can make a more robust system i'll remove it
+        if (ChosenCollars[0] == ChosenCollars[1] || ChosenCollars[0] == ChosenCollars[2] || ChosenCollars[1] == ChosenCollars[2]) { attpsButLess++; goto retry; }
+        if (!Bumpscocity && (ChosenCollars[0] & ChosenCollars[1] & ChosenCollars[2]) != 0) { attpsButLess++; goto retry; } //I turned this stability issue into one of the best ideas I've ever had
         int[] catInitSplit = CalcInits(ChosenCats, ChosenCollars);
         int[] catInits = { catInitSplit[0] * 8 + catInitSplit[3], catInitSplit[1] * 8 + catInitSplit[4], catInitSplit[2] * 8 + catInitSplit[5] };
         if (catInits[0] == catInits[1] || catInits[0] == catInits[2] || catInits[1] == catInits[2] ||
@@ -785,4 +807,25 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
         TargetSels[ix].gameObject.SetActive(true);
         TargetSels[ix].gameObject.transform.localPosition = new Vector3(LEFT_EDGE + x * GRID_SQ, 0.0103f, TOP_EDGE - y * GRID_SQ);
     }
+
+    class LaserLuringSettings
+    {
+        public bool Bumpscocity = false;
+    }
+
+    static Dictionary<string, object>[] TweaksEditorSettings = new Dictionary<string, object>[]
+    {
+        new Dictionary<string, object>
+        {
+            { "Filename", "LaserLuringSettings.json" },
+            { "Name", "Laser Luring Settings" },
+            { "Listing", new List<Dictionary<string, object>>{
+                new Dictionary<string, object>
+                {
+                    { "Key", "Bumpscocity" },
+                    { "Text", "Adjusts the Bumpscocity." }
+                }
+            } }
+        }
+    };
 }
