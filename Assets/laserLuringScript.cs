@@ -199,12 +199,19 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
             
             if ((cc & (int)Math.Pow(2, 2-chnl)) == (int)Math.Pow(2, 2-chnl)) //collar check; all i had to do in previous crashout was this hsjkdhsadjkdhsjkal
             {
-                //if the cat is on the ground (posY == 18), place a target 3 spaces in front (take into account facing direction; ENSURE CAT CAN'T ESCAPE ROOM THAT WOULD BE BAD)
+                int VALUE = 5;
+                //if the cat is on the ground (posY == 18), place a target 5 spaces in front
                 if (CatPosY[kitn] == 18)
                 {
-                    if ((CatFacing[kitn] && CatPosX[kitn] < 4) || (!CatFacing[kitn] && CatPosX[kitn] > 24)) { continue; } //oob check
+                    if ((CatFacing[kitn] && CatPosX[kitn] < 2) || (!CatFacing[kitn] && CatPosX[kitn] > SQ_ACROSS - 3)) { continue; } //oob check
                     
-                    TargX.Add(CatPosX[kitn] + (CatFacing[kitn] ? -3 : 3));
+                    if (CatFacing[kitn])
+                    {
+                        TargX.Add(Math.Max(CatPosX[kitn] - VALUE, 1));
+                    } else
+                    {
+                        TargX.Add(Math.Min(CatPosX[kitn] + VALUE, SQ_ACROSS - 2));
+                    }
                     TargY.Add(18);
                     TargCol.Add(cc);
                 } else //othw put a target on the floor
