@@ -232,9 +232,12 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
                     if (shelf < 3 && CatPosY[kitn] == shy - 1 && Math.Abs(CatPosX[kitn] - shx) < 3 && 
                     ((CatFacing[kitn] && shx < CatPosX[kitn]) || (!CatFacing[kitn] && shx > CatPosX[kitn])))
                     {
-                        TargX.Add(shx);
-                        TargY.Add(shy-1);
-                        TargCol.Add(cc);
+                        if (!catSatisfaction[orders[orderIx][shelf]]) //yes i do need to nest this if (i think) bc indexoutofrangeexception; this prevents having a target appear on dropped item
+                        {
+                            TargX.Add(shx);
+                            TargY.Add(shy-1);
+                            TargCol.Add(cc);   
+                        }
                     }
 
                     //if the cat is on one end of the shelf, facing towards the other end, place a target at the other end
