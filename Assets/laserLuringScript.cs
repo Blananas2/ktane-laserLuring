@@ -52,8 +52,8 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
     };
     int[] IAmScheming = { 2, 3, 5, 7, 11, 13, 17 };
     int[] conv = { 36, 32, 37, 33, 38, 34, 39, 35, 4, 0, 5, 1, 6, 2, 7, 3, 44, 40, 45, 41, 46, 42, 47, 43, 12, 8, 13, 9, 14, 10, 15, 11, 52, 48, 53, 49, 54, 50, 55, 51, 20, 16, 21, 17, 22, 18, 23, 19, 60, 56, 61, 57, 62, 58, 63, 59, 28, 24, 29, 25, 30, 26, 31, 27 };
-    int[] itemIxs = { -1, -1, -1 };
-    int[][] orders = new int[][] { new int[] { 0, 1, 2 }, new int[] { 0, 2, 1 }, new int[] { 1, 0, 2 }, new int[] { 1, 2, 0 }, new int[] { 2, 0, 1 }, new int[] { 2, 1, 0 } };
+    int[] itemIxs = { -1, -1, -1, -1 };
+    int[][] orders = new int[][] { new int[] { 3, 0, 1, 2 }, new int[] { 3, 0, 2, 1 }, new int[] { 3, 1, 0, 2 }, new int[] { 3, 1, 2, 0 }, new int[] { 3, 2, 0, 1 }, new int[] { 3, 2, 1, 0 }, new int[] { 0, 3, 1, 2 }, new int[] { 0, 3, 2, 1 }, new int[] { 1, 3, 0, 2 }, new int[] { 1, 3, 2, 0 }, new int[] { 2, 3, 0, 1 }, new int[] { 2, 3, 1, 0 }, new int[] { 0, 1, 3, 2 }, new int[] { 0, 2, 3, 1 }, new int[] { 1, 0, 3, 2 }, new int[] { 1, 2, 3, 0 }, new int[] { 2, 0, 3, 1 }, new int[] { 2, 1, 3, 0 }, new int[] { 0, 1, 2, 3 }, new int[] { 0, 2, 1, 3 }, new int[] { 1, 0, 2, 3 }, new int[] { 1, 2, 0, 3 }, new int[] { 2, 0, 1, 3 }, new int[] { 2, 1, 0, 3 } };
     int orderIx = -1;
     private int[] cyclingCursorColors = new int[CURSOR_LIMIT];
     bool animating = false;
@@ -110,7 +110,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
             TargetSels[ts].gameObject.SetActive(false);
         }
 
-        orderIx = Rnd.Range(0, 6);
+        orderIx = Rnd.Range(0, orders.Length);
 
         for (int p = 0; p < 3; p++) { CatPosX[p] = Rnd.Range(4, 25); } //gen three initial positions, these are delicately chosen so they can be manipulated while of course staying in view
         Array.Sort(CatPosX); //put them in ascending order
@@ -153,7 +153,8 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
                 Lights[btn].gameObject.SetActive(true);
                 LaserColor = btn;
 
-                int[] catOrd = orders.PickRandom();
+                int[][] bodging = new int[][] { new int[] { 0, 1, 2 }, new int[] { 0, 2, 1 }, new int[] { 1, 0, 2 }, new int[] { 1, 2, 0 }, new int[] { 2, 0, 1 }, new int[] { 2, 1, 0 } };
+                int[] catOrd = bodging.PickRandom();
                 for (int nk = 0; nk < 3; nk++)
                 {
                     int catplant = catOrd[nk];
@@ -227,15 +228,23 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
                     int shx = ShelfPositions[shelf] % SQ_ACROSS;
                     int shy = ShelfPositions[shelf] / SQ_ACROSS;
                     
-                    //if the cat is on a shelf with an item (shelf ix < 3), place a target on the item (1 tile above shelf)
-                    if (shelf < 3 && CatPosY[kitn] == shy - 1 && Math.Abs(CatPosX[kitn] - shx) < 3 && 
+                    //if the cat is on a shelf with an item (shelf ix < 4), place a target on the item (1 tile above shelf)
+                    if (shelf < 4 && CatPosY[kitn] == shy - 1 && Math.Abs(CatPosX[kitn] - shx) < 3 && 
                     ((CatFacing[kitn] && shx < CatPosX[kitn]) || (!CatFacing[kitn] && shx > CatPosX[kitn])))
                     {
-                        if (!catSatisfaction[orders[orderIx][shelf]]) //yes i do need to nest this if (i think) bc indexoutofrangeexception; this prevents having a target appear on dropped item
+                        try
+                        {
+                            if (!catSatisfaction[orders[orderIx][shelf]]) //yes i do need to nest this if (i think) bc indexoutofrangeexception; this prevents having a target appear on dropped item
+                            {
+                                TargX.Add(shx);
+                                TargY.Add(shy-1);
+                                TargCol.Add(cc);
+                            }   
+                        } catch (IndexOutOfRangeException ioore) //should, in theory, be okay!
                         {
                             TargX.Add(shx);
                             TargY.Add(shy-1);
-                            TargCol.Add(cc);   
+                            TargCol.Add(cc);
                         }
                     }
 
@@ -275,7 +284,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
         {
             if (twerp >= TargX.Count())
             {
-                SetSprite(-1, -1, 7, Slots[21+twerp], null, Color.white, false, false);
+                SetSprite(-1, -1, 7, Slots[22+twerp], null, Color.white, false, false);
                 cyclingCursorColors[twerp] = -1;
                 TargetSels[twerp].gameObject.SetActive(false);
                 continue;
@@ -284,13 +293,13 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
             int XY = TargX[twerp] + TargY[twerp] * SQ_ACROSS;
 
             if (Occupied.Contains(XY)) {
-                SetSprite(-1, -1, 7, Slots[21+twerp], null, Color.white, false, false);
+                SetSprite(-1, -1, 7, Slots[22+twerp], null, Color.white, false, false);
                 Buckets[Occupied.IndexOf(XY)]++;
                 Scheme[Occupied.IndexOf(XY)] *= IAmScheming[TargCol[twerp]-1];
                 cyclingCursorColors[twerp] = -1;
             } else 
             {
-                SetSprite(TargX[twerp], TargY[twerp], 9, Slots[21+twerp], OtherSprites[0], COLORS_PROPER[TargCol[twerp]], false, false);
+                SetSprite(TargX[twerp], TargY[twerp], 9, Slots[22+twerp], OtherSprites[0], COLORS_PROPER[TargCol[twerp]], false, false);
                 Occupied.Add(XY);
                 Buckets.Add(1);
                 Scheme.Add(IAmScheming[TargCol[twerp]-1]);
@@ -334,7 +343,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
         while (true)
         {
             cycle = (cycle + 1) % numb;
-            SetSprite(x, y, 9, Slots[21 + slotIx], OtherSprites[0], COLORS_PROPER[untethered[cycle]], false, false);
+            SetSprite(x, y, 9, Slots[22 + slotIx], OtherSprites[0], COLORS_PROPER[untethered[cycle]], false, false);
             cyclingCursorColors[slotIx] = untethered[cycle];
             yield return new WaitForSeconds(1f);
         }
@@ -364,7 +373,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
 
         for (int weirdth = 0; weirdth < CURSOR_LIMIT; weirdth++)
         {
-            SetSprite(whereX, whereY, 9, Slots[21 + weirdth], weirdth == meow ? OtherSprites[4] : null, COLORS_PROPER[LaserColor == 0 ? 4 : LaserColor == 1 ? 2 : 1], false, false);
+            SetSprite(whereX, whereY, 9, Slots[22 + weirdth], weirdth == meow ? OtherSprites[4] : null, COLORS_PROPER[LaserColor == 0 ? 4 : LaserColor == 1 ? 2 : 1], false, false);
         }
 
         float elapsed = 0f;
@@ -433,7 +442,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
             }
         }
 
-        SetSprite(whereX, whereY, 9, Slots[21 + meow], null, Color.white, false, false);
+        SetSprite(whereX, whereY, 9, Slots[22 + meow], null, Color.white, false, false);
         PlaceTargets(LaserColor ?? 0); //compiler shut up i know what i am doing
         animating = false;
     }
@@ -461,7 +470,6 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
             catInitSplit[0] < 0 || catInitSplit[1] < 0 || catInitSplit[2] < 0 || catInitSplit[3] < 0 || catInitSplit[4] < 0 || catInitSplit[5] < 0)
         {
             attps++;
-            Debug.Log("no: " + ChosenCats.Join(",") + " " + ChosenCollars.Join(",") + " " + catInitSplit.Join(","));
             goto retry;
         }
 
@@ -470,12 +478,20 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
             itemIxs[fx] = conv[catInits[fx]];
         }
 
+        int dummy = -1;
+        do
+        {
+            dummy = Rnd.Range(0, 64);
+        } while (dummy == itemIxs[0] || dummy == itemIxs[1] || dummy == itemIxs[2]);
+        itemIxs[3] = dummy;
+
         Debug.LogFormat("<Laser Luring #{0}> Attempts: {1}{2}", moduleId, attps, attpsButLess == 0 ? "" : "." + attps);
         Debug.LogFormat("[Laser Luring #{0}] Cats: {1} {2}, {3} {4}, {5} {6}", moduleId, CAT_NAMES[ChosenCats[0]], COLOR_NAMES[ChosenCollars[0]], CAT_NAMES[ChosenCats[1]], COLOR_NAMES[ChosenCollars[1]], CAT_NAMES[ChosenCats[2]], COLOR_NAMES[ChosenCollars[2]]);
         Debug.LogFormat("[Laser Luring #{0}] {1}'s initial position: Row {2}, Column {3}", moduleId, CAT_NAMES[ChosenCats[0]], catInitSplit[0], catInitSplit[3]);
         Debug.LogFormat("[Laser Luring #{0}] {1}'s initial position: Row {2}, Column {3}", moduleId, CAT_NAMES[ChosenCats[1]], catInitSplit[1], catInitSplit[4]);
         Debug.LogFormat("[Laser Luring #{0}] {1}'s initial position: Row {2}, Column {3}", moduleId, CAT_NAMES[ChosenCats[2]], catInitSplit[2], catInitSplit[5]);
         Debug.LogFormat("[Laser Luring #{0}] Favorite items: {1} for {2}, {3} for {4}, {5} for {6}", moduleId, ITEM_NAMES[itemIxs[0]], CAT_NAMES[ChosenCats[0]], ITEM_NAMES[itemIxs[1]], CAT_NAMES[ChosenCats[1]], ITEM_NAMES[itemIxs[2]], CAT_NAMES[ChosenCats[2]]);
+        Debug.LogFormat("[Laser Luring #{0}] Dummy item: {1}", moduleId, ITEM_NAMES[dummy]);
     }
 
     int[] CalcInits(int[] catV, int[] colV)
@@ -677,7 +693,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
 
         int[] waluigi = orders[orderIx];
 
-        for (int nit = 0; nit < 3; nit++)
+        for (int nit = 0; nit < 4; nit++)
         {
             int it = waluigi[nit];
             bool possibleBump = Rnd.Range(0, 2) == 0;
