@@ -10,7 +10,6 @@ using Rnd = UnityEngine.Random;
 public class laserLuringScript : MonoBehaviour //many many variable names in this script are nonsensical, i'm so sorry that this is how my brain operates
 {
     public KMBombModule Module;
-    public KMBombInfo Bomb;
     public KMAudio Audio;
 
     public KMSelectable[] Buttons;
@@ -389,6 +388,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
                 yield return null;
                 elapsed += Time.deltaTime;
             }
+            Audio.PlaySoundAtTransform("loudthump", transform);
         }
 
         SetSprite(whereX, whereY - 1, 3 + who * 2, Slots[who], CatSprites[ChosenCats[who] * 10], Color.white, CatFacing[who], false);
@@ -415,6 +415,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
                         yield return null;
                         elapsed += Time.deltaTime;
                     }
+                    Audio.PlaySoundAtTransform("quietthump", transform);
                     SetSprite(whereX, 18, 2, Slots[18 + who], ItemSprites[64 + itemIxs[who]], Color.white, false, false);
 
                     if (catSatisfaction[0] && catSatisfaction[1] && catSatisfaction[2])
