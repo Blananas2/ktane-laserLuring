@@ -46,7 +46,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
         new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {2,1},
         new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,1}, new int[] {3,2}, new int[] {1,1}, new int[] {1,3}, new int[] {3,1},
         new int[] {1,1}, new int[] {1,1}, new int[] {1,2}, new int[] {2,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,2}, new int[] {2,2},
-        new int[] {1,1}, new int[] {1,1}, new int[] {2,3}, new int[] {1,1}, new int[] {1,1}, new int[] {2,1}, new int[] {3,2}, new int[] {1,1},
+        new int[] {1,1}, new int[] {1,1}, new int[] {2,3}, new int[] {1,1}, new int[] {1,1}, new int[] {2,2}, new int[] {3,2}, new int[] {1,1},
         new int[] {1,1}, new int[] {1,2}, new int[] {2,1}, new int[] {1,1}, new int[] {1,1}, new int[] {1,3}, new int[] {1,1}, new int[] {1,1},
         new int[] {1,1}, new int[] {1,1}, new int[] {1,2}, new int[] {1,1}, new int[] {2,3}, new int[] {2,2}, new int[] {1,1}, new int[] {1,2} 
     };
