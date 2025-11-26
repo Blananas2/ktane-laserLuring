@@ -32,4 +32,4 @@ MonoBehaviour:
     The manual can be found here: https://ktane.timwi.de/HTML/Laser%20Luring.html'
   version: 
   outputFolder: build
-  previewImage: {fileID: 0}
+  previewImage: {fileID: 2800000, guid: fa83b1b0992a65744ac3c8fe4b69a213, type: 3}

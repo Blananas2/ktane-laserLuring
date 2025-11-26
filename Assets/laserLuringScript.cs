@@ -433,6 +433,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
                         Debug.LogFormat("[Laser Luring #{0}] Cat curiosity satisfied, module solved.", moduleId);
                         Module.HandlePass();
                         moduleSolved = true;
+                        Audio.PlaySoundAtTransform("meow", transform);
                     }
                 } else
                 {
@@ -572,17 +573,17 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
                     break;
                 case 5: //Remi
                     if (catV[0] < catV[1] && catV[1] < catV[2] && catV[0] < catV[2]) //ABC
-                    { initCols[i] = 6; initRows[i] = 4; }
+                    { initCols[i] = 0; initRows[i] = 1; }
                     if (catV[0] < catV[2] && catV[2] < catV[1] && catV[0] < catV[1]) //ACB
                     { initCols[i] = 5; initRows[i] = 0; }
                     if (catV[1] < catV[0] && catV[0] < catV[2] && catV[1] < catV[2]) //BAC
-                    { initCols[i] = 4; initRows[i] = 7; }
+                    { initCols[i] = 0; initRows[i] = 2; }
                     if (catV[1] < catV[2] && catV[2] < catV[0] && catV[1] < catV[0]) //CAB
-                    { initCols[i] = 2; initRows[i] = 5; }
+                    { initCols[i] = 7; initRows[i] = 0; }
                     if (catV[2] < catV[0] && catV[0] < catV[1] && catV[2] < catV[1]) //BCA
-                    { initCols[i] = 3; initRows[i] = 2; }
+                    { initCols[i] = 1; initRows[i] = 0; }
                     if (catV[2] < catV[1] && catV[1] < catV[0] && catV[2] < catV[0]) //CBA
-                    { initCols[i] = 1; initRows[i] = 6; }
+                    { initCols[i] = 6; initRows[i] = 6; }
                     break;
                 case 6: //Scar
                     int[] scarTrack = { -1, -1 };
@@ -591,7 +592,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
                         if (catV[g] == 6) { continue; }
                         scarTrack[scarTrack[0] == -1 ? 0 : 1] = colV[g];
                     }
-                    initCols[i] = COLOR_NAMES[scarTrack[0]].Length;
+                    initCols[i] = COLOR_NAMES[scarTrack[0]].Length - 3;
                     initRows[i] = COLOR_NAMES[scarTrack[1]].Length;
                     break;
                 case 7: //Tiki
