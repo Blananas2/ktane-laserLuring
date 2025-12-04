@@ -128,7 +128,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
         }
 
         ShelfPositions = GenerateShelves();
-        Debug.LogFormat("<Laser Luring #{0}> Shelves: {1}", moduleId, ShelfPositions.Select(i => GetCoord(i)).Join(" "));
+        Debug.LogFormat("<Laser Luring #{0}> Shelves: {1} | {2}", moduleId, ShelfPositions.Select(i => GetCoord(i)).Join(" "), ShelfPositions.Join(","));
         for (int s = 0; s < 9; s++)
         {
             int flipIt = Rnd.Range(0, 4);
@@ -256,7 +256,7 @@ public class laserLuringScript : MonoBehaviour //many many variable names in thi
                         TargCol.Add(cc);
                     }
 
-                    if ((CatFacing[kitn] && (shx < CatPosX[kitn] - 3)) || (!CatFacing[kitn] && (shx > CatPosX[kitn] + 3)))
+                    if ((CatFacing[kitn] && (shx < CatPosX[kitn] - 2)) || (!CatFacing[kitn] && (shx > CatPosX[kitn] + 2)))
                     {
                         //if manhattan distance between cat's current position and the target position is within duration range, add the target
                         if ((Math.Abs((shx + (CatFacing[kitn] ? 2 : -2)) - CatPosX[kitn]) + Math.Abs((shy - 1) - CatPosY[kitn])) <= IN_AIR_DURATION)
